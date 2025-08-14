@@ -1,0 +1,66 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+
+\usepackage[dvipsnames]{xcolor,soul}
+\usepackage[framemethod=TikZ]{mdframed}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%           CUADROS DE TEXTO              %%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcounter{theo}[section]\setcounter{theo}{1}
+\renewcommand{\thetheo}{\arabic{theo}}
+\newenvironment{theo}[2][]{%
+\refstepcounter{theo}%
+\ifstrempty{#1}%
+{\mdfsetup{%
+frametitle={%
+\tikz[baseline=(current bounding box.east),outer sep=0pt]
+\node[anchor=east,rectangle,fill=red!40]
+{\strut Teorema~\thetheo};}}
+}%
+{\mdfsetup{%
+frametitle={%
+\tikz[baseline=(current bounding box.east),outer sep=0pt]
+\node[anchor=east,rectangle,fill=red!30]
+{\strut Teorema~\thetheo:~#1};}}%
+}%
+\mdfsetup{innertopmargin=10pt,linecolor=red!30,%
+linewidth=2pt,topline=true,%
+frametitleaboveskip=\dimexpr-\ht\strutbox\relax
+}
+\begin{mdframed}[]\relax%
+\label{#2}}{\end{mdframed}}
+
+\begin{document}
+
+This example shows different examples on how to use the \texttt{xcolor} package 
+to change the colour of elements in \LaTeX.
+
+\begin{itemize}
+\color{ForestGreen}
+\item First item
+\item Second item
+\end{itemize}
+
+\noindent
+{\color{RubineRed} \rule{\linewidth}{0.5mm} }
+
+The background colour of some text can also be \textcolor{red}{easily} set. For 
+instance, you can change to orange the background of \colorbox{BurntOrange}{this 
+text} and then continue typing.
+
+\begin{theo}[Pythagoras' theorem]{thm:pythagoras}
+In a right triangle, the square of the hypotenuse is equal to the sum of the squares of the catheti.
+$$a^2+b^2=c^2$$
+\end{theo}
+In mathematics, the Pythagorean theorem, also known as Pythagoras' theorem (see theorem \ref{thm:pythagoras}), is a relation in Euclidean geometry among the three sides of a right triangle.
+
+
+\sethlcolor{pink}  
+The text given here is the \hl{highlighted text in pink.}\\  
+  
+\sethlcolor{orange}  
+The text given here is the \hl{highlighted text in orange.}  
+
+\end{document}
