@@ -7,7 +7,7 @@
 \documentclass[10pt]{article}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
-\usepackage[spanish]{babel}
+\usepackage[english]{babel}
 \usepackage{listings}
 \lstset{language=R}
 \usepackage[a4paper]{geometry}
@@ -15,6 +15,7 @@
 \usepackage[framemethod=TikZ]{mdframed}
 \usepackage{graphicx,tikz}
 \usepackage{array}
+
 
 \geometry{top=2.54cm, bottom=2.54cm, left=2.54cm, right=2.54cm}
 
@@ -81,22 +82,17 @@ frametitleaboveskip=\dimexpr-\ht\strutbox\relax
 %==========     ESTILO TITLE     ==========
 %==========================================
 \newcommand{\City}[1]{\def\City{#1}}
-\newcommand{\Cargo}[1]{\def\Cargo{#1}}
 
 \makeatletter         
 \renewcommand\maketitle{
 \begin{flushleft}
-{\textcolor{black}{\Huge \bfseries \@title }}\\[1ex]
+{\textcolor{black}{\huge \bfseries \@title }}\\[1ex]
 \rule{\textwidth}{0.6pt}\\
 \end{flushleft}
 \vspace{-0.5cm}
-\begin{flushright}
-{\large \textit {\City, \@date}}\\[4ex]
-\end{flushright}
 
 \begin{flushleft}
-\textcolor{NavyBlue!80}{{\large  \@author} }\\[1.5ex]
-\textcolor{NavyBlue!80}{{\large  \Cargo} }\\[5ex]
+\textcolor{black}{{\large  \@author} }\\[2ex]
 \end{flushleft} } % Note the extra }
 \makeatother
 %
@@ -155,11 +151,8 @@ frametitleaboveskip=\dimexpr-\ht\strutbox\relax
 
 %==============================================================
 %==============================================================
-\title{Titulo}
-\City{Ciudad}
-\date{01 de Enero de 2023}
-\author{Nombre y Apellido}
-\Cargo{Cargo}
+\title{ }
+
 %==============================================================
 %==============================================================
 
@@ -168,213 +161,69 @@ frametitleaboveskip=\dimexpr-\ht\strutbox\relax
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{document}
 
-\maketitle
-
-\section*{Introducción}
-\lipsum[2-3]
-
-\section*{Reporte de error}
-Se reportó un error con las siguientes características:
-
-\begin{table}[htp!]
+\begingroup
+\let\clearpage\relax % prevent extra page breaks
+\thispagestyle{empty}
 \begin{center}
-\begin{tabular}{>{\centering\arraybackslash}m{3cm}| >{\arraybackslash}m{11cm} }
-\hline
-\\
-ID number & 2147483647 \\
-\\
-\hline
-\\
-Name & \texttt{321 Error validating request.- 'br':'cause - Invalid account code '1'} \\
-\\
-\hline
-\\
-Date & 14/Ene/2023 \\
-\\
-\hline
-\end{tabular}
+{\huge \bfseries Universidad de los Andes}
+
+\vspace{25pt}
+{\LARGE \bfseries Departamento de Ingeniería de Sistemas}
+
+\vspace{15pt}
+\includegraphics[width=100pt]{images/logo.png} 
+
+
+\vspace{35pt}
+{\LARGE \bfseries Laboratorio: Introducción a Redes de Datos}
+\vspace{55pt}
+
+{\Large \bfseries ISIS3204 - Infraestructura de Comunicaciones}
+
+\vspace{15pt}
+{\Large \bfseries Profesor -Yuri Andrea Pinto Rojas}
+
+
+\vspace{100pt}
+{\Large \bfseries Grupo 3: }
+
 \end{center}
-\end{table}
 
-\subsection*{Descripción}
-El error en sí, según algunos foros, puede ser debido al \textbf{TWS} o por una letra de más al final de la \texttt{Account code}
+\begin{flushleft}
+  \setlength{\parskip}{0pt}
+  \setlength{\itemsep}{0pt}
+  \hspace*{4cm}\large\bfseries Juan Esteban Quiroga - 202013216
 
-\begin{mdframed}[backgroundcolor=NavyBlue!5,middlelinecolor=MidnightBlue,
-                 middlelinewidth=2pt,shadow=false,roundcorner=3pt]
-\lipsum[2][1-4]
-\end{mdframed}
+  \hspace*{4cm}\large\bfseries Juan Manuel Rodriguez - 202013372
 
-\newpage
+  \hspace*{4cm}\large\bfseries Andres Felipe Ortiz - 201727662
+\end{flushleft}
 
-\lipsum[1][1-8]
+\begin{center}
+\vspace{60pt}
 
-\begin{wrapfigure}{r}{0.21\textwidth}  
-    \centering
-    \includegraphics[width=\linewidth]{Imagenes/ImgEj1.jpg} 
-    \caption{Caption 1}
-    \label{fig:wrapfig}
-\end{wrapfigure}
-
-\lipsum[4][1-10]
-
-\lipsum[8]
-
-\lipsum[10][1-6]
-
-\begin{figure}[h!]
-    \centering
-    \includegraphics[scale=0.2, angle=4]{Imagenes/ImgEj2.png}
-    \caption{Caption}
-    \label{fig:my_label}
-\end{figure}
-
-\begin{theo}[Pythagoras teorema]{thm:pythagoras}
-In a right triangle, the square of the hypotenuse is equal to the sum of the squares of the catheti. $$a^2+b^2=c^2$$
-\end{theo}
-
-In mathematics, the Pythagorean theorem, also known as Pythagoras theorem (see theorem \ref{thm:pythagoras}), is a relation in Euclidean geometry among the three sides of a right triangle.
+\Large\bfseries 2025-10
+\end{center}
 
 
-\section*{Motivación}
+\mbox{}
+\endgroup
 
-%%%%%%%%%%%%%%%%%%%%%%%
-Esta sección\footnote{A veces esta sección se denomina \textit{justificación}, aunque \textit{motivación} está más extendido. \lipsum[6][1-6]} describe qué factores han hecho al estudiante decantarse por trabajar en éste y no en otro tema. Las imágenes se pueden, y se deben, citar y referenciar. Más aun, cuando se han sacado de internet. En este apartado se hablará de las imágenes extraídas online, que se referencian en estilo de: figuras, imágenes y/o tablas. También se tratarán las imágenes extraídas de redes sociales como Twitter, Instagram o YouTube.
-%%%%%%%%%%%%%%%%%%%%%%
+\clearpage
 
-\newpage
+\tableofcontents
+\clearpage
 
-\begin{figure}[h!]
-  \begin{subfigure}{0.5\textwidth}
-     \centering
-     \includegraphics[width=0.6\linewidth]{Imagenes/ImgEj1.jpg} 
-     \caption{Caption1}
-     \label{fig:subim1}
-     \end{subfigure}
-  \begin{subfigure}{0.5\textwidth}
-     \centering
-     \includegraphics[scale=0.3]{Imagenes/ImgEj2.png}
-     \caption{Caption 2}
-     \label{fig:subim2}
-     \end{subfigure}
+\section{4.1 Configuración del Direccionamiento de la red (servicio de DHCP e IPs estáticas)}
+ad
+s
+dadadfada
 
-  \caption{Caption for this figure with two images}
-  \label{fig:image2}
-\end{figure}
-
-\lipsum[7]
-
-\begin{table}[h!]
-    \centering
-    \begin{tabular}{ |p{3cm}||p{3cm}|p{3cm}|p{3cm}|  }
-    \hline
-    \multicolumn{4}{|c|}{Country List} \\
-    \hline
-     Country Name or Area Name& ISO ALPHA 2 Code &ISO ALPHA 3 Code&ISO numeric Code\\
-    \hline
-     Afghanistan   & AF    &AFG&   004\\
-     Aland Islands&   AX  & ALA   &248\\
-     Albania &AL & ALB&  008\\
-     Algeria    &DZ & DZA&  012\\
-     American Samoa&   AS  & ASM&016\\
-     Andorra& AD  & AND   &020\\
-     Angola& AO  & AGO&024\\
-    \hline
-    \end{tabular}
-    \caption{Rows and columns can be merged to create larger table cells. The following example uses the \textit{multicolumn} command to merge several columns: }
-    \label{tab:my_label}
-\end{table}
-
-\lipsum[9][1-5]
-
-
-\begin{multicols}{2}
-\begin{itemize}
-    \item Fedora Versions
-    \begin{itemize}
-        \item Fedora 8
-        \item Fedora 9
-        \begin{itemize}
-            \item Werewolf
-            \item Sulphur
-            \begin{itemize}
-                \item 2007-05-31
-                \item 2008-05-13
-            \end{itemize}
-        \end{itemize}
-    \end{itemize}
-    \item Fedora Spin
-    \item Fedora Silverblue
-\end{itemize}
-
-\columnbreak
-
-% Itemize style
-\begin{itemize}
-    \item[$\ast$] Asterisk 
-    \item[$\diamond$] Diamond 
-    \item[$\circ$] Circle 
-    \item[$\cdot$] Period
-    \item[$\bullet$] Bullet (default)
-    \item[--] Dash
-    \item[$-$] Another dash
-\end{itemize}
-
-\end{multicols}
-
-\newpage
-
-\begin{mdframed}[backgroundcolor=NavyBlue!5,middlelinecolor=MidnightBlue,
-                 middlelinewidth=2pt,shadow=false,roundcorner=3pt]
-    Vertical farming has 3 main cropping systems:
-    \begin{itemize}
-        \item size{Aeroponics} This system aims to place the crop is suspended in the air, therefore, irrigation is done by a mist or spray containing the necessary minerals and nutrients, which is supplied directly to the roots.
-        \textbf{Hydroponics.} For this, the roots remain submerged in water, or a liquid solution containing the nutrients it requires, plus the water must always be in motion. 
-        \textbf{Aquaponics:} The system is similar to the previous one, with the difference that in this one not only plants are cultivated, but also aquatic animals are raised. The animal waste is used as fertilizer for the plants, since the water where the animals live is filtered and irrigated for cultivation. 
-    \end{itemize}
-    
-        \begin{center}
-           \captionsetup{type=figure} % <---
-           \begin{minipage}{.3\textwidth}
-              \subfloat[Aeroponía]{\includegraphics[width=\linewidth]{Imagenes/VfarmAero.png}}
-              \label{fig:sub1}
-           \end{minipage}%
-           \hfill
-           \begin{minipage}{.3\textwidth}
-              \subfloat[Hidroponía]{\includegraphics[width=\linewidth]{Imagenes/VfarmHydro.png}}
-              \label{fig:sub2}
-           \end{minipage}
-           \hfill
-           \begin{minipage}{.3\textwidth}
-              \subfloat[Acuaponía]{\includegraphics[width=\linewidth]{Imagenes/VfarmAqua.png}}
-              \label{fig:sub2}
-           \end{minipage}
-
-           \captionof{figure}{Tipos de cultivo en agricultira vertical}
-           \label{fig:test}
-        \end{center}
-        
-    \end{mdframed}
-
-    Another of this company's strengths is LED lighting. AeroFarms has focused on specialized lighting software, where the algorithm is customized for each plant, providing them with exactly the spectrum, intensity and frequency of light they need for photosynthesis. With this set of lights, the size, shape, texture, color, flavor and even nutrients of the plants can be optimized. (\cite{AeroFarm2})
-    
-\section*{Vertical farming in small experiments:}
-
-The following are articles that explain, on a small scale, how a vertical farming design can be implemented:
-
-\begin{itemize}
-    \item \textit{''Artificial Intelligence Driven Vertical Farming Management System"} (\url{https://www.iaeng.org/publication/WCE2022/WCE2022_pp108-113.pdf})
-     \item \textit{''Combining an R-Based Evolutionary Algorithm and Hydrological Model for Effective Parameter Calibration "} (\url{https://www.mdpi.com/2073-4441/10/10/1339})
-     \item \textit{"Nutrient Use in Vertical Farming: Optimal Electrical Conductivity of Nutrient Solution for Growth of Lettuce and Basil in Hydroponic Cultivation"} (\url{https://www.researchgate.net/publication/354339414})
-     \item \textit{"Vertical Farming Case Study, Published by Alberta Agriculture, Forestry and Rural Economic Developmen"} (\url{https://open.alberta.ca/dataset/1c1f48a2-63b9-4dcb-823c-aa49a9a7c810/resource/b0cdfe26-7058-4ee9-a40a-7a3dcff2fe89/download/af-vertical-farming-case-study-2021-04.pdf})
-\end{itemize}
-
-
-%==============================================================
-
-\newpage
-\section*{Referencias}
-  \nocite{*}
-  \printbibliography[heading=none]
+\section{4.2 Configuración de servicio DNS}
+\section{4.3 Pruebas de Conectividad (Comando ping) y Exploración del Protocolo DNS}
+\section{4.4 Configuración y Exploración del servidor WEB}
+\section{4.5 Configuración y exploración de los protocolos de correo electrónico SMTP y POP3}
+\section{4.6 Configuración y exploración de protocolo FTP}
 
 \end{document}
 

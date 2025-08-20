@@ -1,0 +1,7 @@
+\babel@toc {english}{}\relax 
+\contentsline {section}{\numberline {1}4.1 Configuración del Direccionamiento de la red (servicio de DHCP e IPs estáticas)}{3}{section.1}%
+\contentsline {section}{\numberline {2}4.2 Configuración de servicio DNS}{3}{section.2}%
+\contentsline {section}{\numberline {3}4.3 Pruebas de Conectividad (Comando ping) y Exploración del Protocolo DNS}{3}{section.3}%
+\contentsline {section}{\numberline {4}4.4 Configuración y Exploración del servidor WEB}{3}{section.4}%
+\contentsline {section}{\numberline {5}4.5 Configuración y exploración de los protocolos de correo electrónico SMTP y POP3}{3}{section.5}%
+\contentsline {section}{\numberline {6}4.6 Configuración y exploración de protocolo FTP}{3}{section.6}%
