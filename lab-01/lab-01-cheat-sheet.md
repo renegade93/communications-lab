@@ -1,4 +1,4 @@
-# 📑 Lab Defense Cheat Sheet (with embedded theory)
+# 📑 Lab 01 Defense Cheat Sheet 
 
 ---
 
