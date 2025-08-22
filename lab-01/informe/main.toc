@@ -1,12 +1,29 @@
 \babel@toc {english}{}\relax 
-\contentsline {section}{\numberline {1}4.1 Configuración del Direccionamiento de la red (servicio de DHCP e IPs estáticas)}{3}{section.1}%
-\contentsline {subsection}{\numberline {1.1}Configuración de los servidores con IP estática}{3}{subsection.1.1}%
-\contentsline {subsection}{\numberline {1.2}Configuración del Servidor DHCP}{3}{subsection.1.2}%
-\contentsline {subsection}{\numberline {1.3}Asignación dinámica en clientes}{4}{subsection.1.3}%
-\contentsline {section}{\numberline {2}4.2 Configuración de servicio DNS}{4}{section.2}%
-\contentsline {subsection}{\numberline {2.1}Pasos realizados}{4}{subsection.2.1}%
-\contentsline {subsection}{\numberline {2.2}Registros configurados}{5}{subsection.2.2}%
-\contentsline {section}{\numberline {3}4.3 Pruebas de Conectividad (Comando ping) y Exploración del Protocolo DNS}{5}{section.3}%
-\contentsline {section}{\numberline {4}4.4 Configuración y Exploración del servidor WEB}{5}{section.4}%
-\contentsline {section}{\numberline {5}4.5 Configuración y exploración de los protocolos de correo electrónico SMTP y POP3}{5}{section.5}%
-\contentsline {section}{\numberline {6}4.6 Configuración y exploración de protocolo FTP}{5}{section.6}%
+\contentsline {section}{\numberline {4.1}Configuración del Direccionamiento de la red (servicio de DHCP e IPs estáticas)}{3}{section.1}%
+\contentsline {subsection}{\numberline {4.1.1}Configuración de los servidores con IP estática}{3}{subsection.1.1}%
+\contentsline {subsection}{\numberline {4.1.2}Configuración del Servidor DHCP}{3}{subsection.1.2}%
+\contentsline {subsection}{\numberline {4.1.3}Asignación dinámica en clientes}{4}{subsection.1.3}%
+\contentsline {section}{\numberline {4.2}Configuración de servicio DNS}{4}{section.2}%
+\contentsline {subsection}{\numberline {4.2.1}Pasos realizados}{4}{subsection.2.1}%
+\contentsline {subsection}{\numberline {4.2.2}Registros configurados}{5}{subsection.2.2}%
+\contentsline {section}{\numberline {4.3}Pruebas de Conectividad (Comando ping) y Exploración del Protocolo DNS}{5}{section.3}%
+\contentsline {subsection}{\numberline {4.3.1}Obtener direcciones ip usuarios}{5}{subsection.3.1}%
+\contentsline {subsection}{\numberline {4.3.2}Prueba ping a los diferentes usuarios}{6}{subsection.3.2}%
+\contentsline {subsection}{\numberline {4.3.3}Ping al servidor web}{6}{subsection.3.3}%
+\contentsline {subsection}{\numberline {4.3.4}Ping web.labredes.com}{6}{subsection.3.4}%
+\contentsline {subsection}{\numberline {4.3.5}Ejecutar nslookup}{7}{subsection.3.5}%
+\contentsline {section}{\numberline {4.4}Configuración y Exploración del servidor WEB}{7}{section.4}%
+\contentsline {subsection}{\numberline {4.4.1}Habilitar servicios HTTP y HTTPS}{8}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.4.2}Creacion de paginas de presentacion}{8}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.4.3}Pruebas de conectividad servicios HTTP y HTTPS}{9}{subsection.4.3}%
+\contentsline {subsection}{\numberline {4.4.4}Prueba de conexion HTTP usando el buscador}{9}{subsection.4.4}%
+\contentsline {subsection}{\numberline {4.4.5}Prueba de conexion HTTP usando el buscador}{10}{subsection.4.5}%
+\contentsline {section}{\numberline {4.5}Configuración y exploración de los protocolos de correo electrónico SMTP y POP3}{10}{section.5}%
+\contentsline {subsection}{\numberline {4.5.1}Configuración de email server}{10}{subsection.5.1}%
+\contentsline {subsection}{\numberline {4.5.2}Prueba de conectividad al email server}{11}{subsection.5.2}%
+\contentsline {subsection}{\numberline {4.5.3}Configuración de emails en maquinas de cliente}{11}{subsection.5.3}%
+\contentsline {subsection}{\numberline {4.5.4}Envío y recepción de correos entre clientes}{12}{subsection.5.4}%
+\contentsline {section}{\numberline {4.6}Configuración y exploración de protocolo FTP}{12}{section.6}%
+\contentsline {subsection}{\numberline {4.6.1}Configuración de usuarios en el FTP server}{13}{subsection.6.1}%
+\contentsline {subsection}{\numberline {4.6.2}Prueba de conectividad al FTP server}{13}{subsection.6.2}%
+\contentsline {subsection}{\numberline {4.6.3}Conexión y descarga de archvios al FTP server}{13}{subsection.6.3}%

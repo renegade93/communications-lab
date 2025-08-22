@@ -16,6 +16,8 @@
 \usepackage{graphicx,tikz}
 \usepackage{array}
 \usepackage{float}
+\usepackage{tocloft}
+\setlength{\cftsecnumwidth}{2em}
 
 \geometry{top=2.54cm, bottom=2.54cm, left=2.54cm, right=2.54cm}
 
@@ -88,7 +90,7 @@
 \renewcommand{\labelitemiii}{$\cdot$} 
 
 %==========================================
-%===   	LINKS (Agregar Hyperlinks)     ====
+%===    LINKS (Agregar Hyperlinks)     ====
 %==========================================
 \usepackage[style=apa,
             urldate=long]{biblatex} 
@@ -171,8 +173,9 @@
 %==============================================================
 %=====================   4.1   ================================
 %==============================================================
-
-\section{4.1 Configuración del Direccionamiento de la red (servicio de DHCP e IPs estáticas)}
+\renewcommand{\thesection}{4.\arabic{section}}
+\setcounter{section}{0}
+\section{Configuración del Direccionamiento de la red (servicio de DHCP e IPs estáticas)}
 
 En esta primera parte del laboratorio se buscó garantizar que todos los dispositivos de la red tuvieran una dirección IP válida y adecuada para comunicarse. Para ello se combinaron configuraciones de tipo \textbf{estática} (en los servidores) y de tipo \textbf{dinámica} (para los clientes).
 
@@ -231,7 +234,7 @@ En conclusión, la red quedó con un direccionamiento mixto: los servidores con 
 %=====================   4.2   ================================
 %==============================================================
 
-\section{4.2 Configuración de servicio DNS}
+\section{Configuración de servicio DNS}
 
 El servicio DNS fue implementado en el Server1. Su propósito es \textbf{traducir nombres de dominio a direcciones IP}, de manera que los usuarios no tengan que recordar números, sino que puedan acceder a los servicios escribiendo su URL.
 
@@ -261,10 +264,9 @@ El servicio DNS fue implementado en el Server1. Su propósito es \textbf{traduci
 Gracias a esta configuración, al realizar pruebas desde los clientes se logró acceder a los servicios tanto por dirección IP como por nombre de dominio. Esto demuestra el correcto funcionamiento del servidor DNS dentro de la red diseñada.
 
 %==============================================================
-%==================   RESTO SECCIONES   =======================
+%=====================   4.3   ================================
 %==============================================================
-
-\section{4.3 Pruebas de Conectividad (Comando ping) y Exploración del Protocolo DNS}
+\section{Pruebas de Conectividad (Comando ping) y Exploración del Protocolo DNS}
 
 Para este punto vamos a probar la correcta conectividad de los equipos de los clientes y, sobretodo, verificaremos el correcto funcionamiento del servidor DNS, esto a traves del comando \textbf{ping} mostrandonos el tiempo de respuesta del servidor y si es accesible o no.
 
@@ -315,7 +317,11 @@ Como vemos en la figura 8, tenemos que la respuesta del ping es favorable, y ade
     \caption{Ejecucion del comando nslookup.}
 \end{figure}
 Como vemos en la figura 9 el comando \textbf{nslookup} no solo nos dice la informacion de un servidor, sino que tambien nos puede decir si cierto dominio es inexistente. Util para hallar informacion a cerca de los servidores asociados a un dominio o para solucionar problemas que puedan estar relacionados al DNS.
-\section{4.4 Configuración y Exploración del servidor WEB}
+
+%==============================================================
+%=====================   4.4   ================================
+%==============================================================
+\section{Configuración y Exploración del servidor WEB}
 Para esta punto del laboratorio buscaremos configurar el servidor web, con los protocolos \textit{HTTP y HTTPS} Teniendo en cuenta que, como vimos en los puntos anteriores, ya hemos configurado el DNS y su IP para asegurar su correcto funcionamiento.
 \subsection{Habilitar servicios HTTP y HTTPS}
 \begin{figure}[H]
@@ -353,7 +359,93 @@ En la figura 13 podemos ver como la conexion al servidor web fue exitosa usando 
 \end{figure}
 En la figura 14 podemos ver como la conexion al servidor web fue exitosa usando el protocolo web HTTPS, pues la pagina \textit{index} cargo exitosamente, demostrando asi con el paso anterior que ambos servicios estan en linea y funcionando segun lo esperado.
 
-\section{4.5 Configuración y exploración de los protocolos de correo electrónico SMTP y POP3}
-\section{4.6 Configuración y exploración de protocolo FTP}
+%==============================================================
+%===========================  4.5   ===========================
+%==============================================================
+\section{Configuración y exploración de los protocolos de correo electrónico SMTP y POP3}
+En esta sección del laboratorio, realizamos la configuración y validación de servicios de email en la red simulada. Para lograrlo, activamos SMTP y POP3 en el servidor de email (192.168.1.34) para enviar emails de un cliente a otro y recuperar los emails en el cliente destino.
+\subsection{Configuración de email server}
+Configuramos el servidor de email para que no ofrezca servicios que no tengan que ver con email. Habilitamos el servicio SMTP que escucha en el puerto 25 y funciona para que los clientes puedan enviar emails. También habilitamos el servicio POP3 que escucha en el puerto 110 y funciona para que los clientes puedan recibir emails. Juntos, estos protocolos completan el ciclo de comunicación por email. Adicionalmente, se agregaron usuarios y contraseñas para cada miembro del grupo. Estas credenciales sirven para autenticar a cada cliente al enviar (SMTP) y recibir (POP3) mensajes, asegurando que cada usuario solamente tenga acceso a su propio mailbox.
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{lab-01-screenshots/45-1-email-config.png}
+    \caption{Configuracion de email server}
+\end{figure}
+
+
+\subsection{Prueba de conectividad al email server}
+En este paso se realizó una prueba de conectividad para asegurar que el servidor de email sea alcanzable desde las máquinas de los clientes. Si el cliente que realiza el \textbf{ping} obtiene respuestas, significa que el enrutamiento entre la subred del usuario y la subred del servidor de email está correcto.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{lab-01-screenshots/45-2-ping-email}
+    \caption{\textbf{ping} al email server}
+\end{figure}
+
+Esta prueba es importante ya que SMTP ni POP3 van a funcionar correctamente si falla el ping, ya que esos protocolos de la capa de aplicación dependen de que la conexión TCP esté funcionando.
+
+\subsection{Configuración de emails en maquinas de cliente}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{lab-01-screenshots/45-3-client-config.png}
+    \caption{Configuración cliente email para a.ortizg}
+\end{figure}
+
+Después de verificar que sea posible establecer una conexión entre los clientes y el servidor de email, configuramos a cada usuario en las máquinas de los clientes con su respectivo email, contraseña, y la información del servidor de email. Esta configuración le deja saber al servidor de email quién es el usuario y a dónde debe dirigir correos destinados a un usuario en particular.
+
+\subsection{Envío y recepción de correos entre clientes}
+Al realizar las configuraciones de los clientes, podemos enviar un mensaje de un cliente a otro. A continuacion describimos los pasos para realizar esta comunicacion:
+\begin{enumerate}
+\item \textit{a.ortizg} escribe un mensaje para \textit{j.quirogar}
+\item Por medio de SMTP \textit{a.ortizg} manda el mensaje al email server
+\item El email server lo recibe y lo mete en el buzón de \textit{j.quirogar}
+\item Cuando el cliente de \textit{j.quirogar} revisa su buzón, se conecta con POP3, se autentica, y descarga el mensaje
+\item El mensaje es mercado para eliminacioón del email server (si se elimina del cliente, desaparece para siempre)
+\end{enumerate}
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{lab-01-screenshots/45-4-send-receive.png}
+    \caption{Enviando/recibiendo un email}
+\end{figure}
+
+%==============================================================
+%===========================  4.6   ===========================
+%==============================================================
+\section{Configuración y exploración de protocolo FTP}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{lab-01-screenshots/46-1-ftp-config}
+    \caption{Configuración de FTP server}
+\end{figure}
+
+\subsection{Configuración de usuarios en el FTP server}
+
+Para lograr el envió de archivos entre cliente y servidor en nuestra red simulada, configuramos el FTP server. FTP funciona con dos canales: El canal de control (port 21) donde el cliente manda comandos y el servidor responde y el canal de datos (port 20) donde el contenido del archivo se mueve. En la figura 9 se ven las credenciales de los usuarios del FTP server.
+
+
+\subsection{Prueba de conectividad al FTP server}
+De forma similar a la prueba de conectividad al email server, también realizamos las prueba para el FTP server. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{lab-01-screenshots/46-2-ping-ftp}
+    \caption{\textbf{ping} al FTP server}
+\end{figure}
+
+\subsection{Conexión y descarga de archvios al FTP server}
+Para que un cliente configurado pueda descargar archivos del FTP server se conecta por medio del comando \textbf{ftp ftp.labredes.com}.El cliente luego corre \textbf{dir} y el servidor responde con la lista de archivos disponibles. El cliente luego realiza un GET paraindicarle al servidor que tiene que enviar el archvio. El servidor establece una   conexión separada para los datos en puerto 20 mientras que el canal de control permanece abierto. El servidor luego lee el archivo de almacenamiento y manda el contenido del archivo al cliente en un bit stream sobre el canal de datos. TCP se asegura de que el archivo llegue intacto. El cliente escribe los bits de llegada en un archivo locval nuevo y completa la descarga. Cuando se acaba la transferencia, el servidor cierra el canal de datos pero deja abierto el canal de control para recibir otro comando. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{lab-01-screenshots/46-3-get-ftp}
+    \caption{Menu de FTP server y descarga de archivo}
+\end{figure}
+
 
 \end{document}
