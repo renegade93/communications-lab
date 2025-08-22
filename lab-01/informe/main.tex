@@ -16,6 +16,8 @@
 \usepackage{graphicx,tikz}
 \usepackage{array}
 \usepackage{float}
+\usepackage{tocloft}
+\setlength{\cftsecnumwidth}{2em}
 
 \geometry{top=2.54cm, bottom=2.54cm, left=2.54cm, right=2.54cm}
 
@@ -171,8 +173,9 @@
 %==============================================================
 %=====================   4.1   ================================
 %==============================================================
-
-\section{4.1 Configuración del Direccionamiento de la red (servicio de DHCP e IPs estáticas)}
+\renewcommand{\thesection}{4.\arabic{section}}
+\setcounter{section}{0}
+\section{Configuración del Direccionamiento de la red (servicio de DHCP e IPs estáticas)}
 
 En esta primera parte del laboratorio se buscó garantizar que todos los dispositivos de la red tuvieran una dirección IP válida y adecuada para comunicarse. Para ello se combinaron configuraciones de tipo \textbf{estática} (en los servidores) y de tipo \textbf{dinámica} (para los clientes).
 
@@ -231,7 +234,7 @@ En conclusión, la red quedó con un direccionamiento mixto: los servidores con 
 %=====================   4.2   ================================
 %==============================================================
 
-\section{4.2 Configuración de servicio DNS}
+\section{Configuración de servicio DNS}
 
 El servicio DNS fue implementado en el Server1. Su propósito es \textbf{traducir nombres de dominio a direcciones IP}, de manera que los usuarios no tengan que recordar números, sino que puedan acceder a los servicios escribiendo su URL.
 
@@ -260,13 +263,66 @@ El servicio DNS fue implementado en el Server1. Su propósito es \textbf{traduci
 \bigskip
 Gracias a esta configuración, al realizar pruebas desde los clientes se logró acceder a los servicios tanto por dirección IP como por nombre de dominio. Esto demuestra el correcto funcionamiento del servidor DNS dentro de la red diseñada.
 
-%==============================================================
-%==================   RESTO SECCIONES   =======================
-%==============================================================
 
-\section{4.3 Pruebas de Conectividad (Comando ping) y Exploración del Protocolo DNS}
-\section{4.4 Configuración y Exploración del servidor WEB}
-\section{4.5 Configuración y exploración de los protocolos de correo electrónico SMTP y POP3}
-\section{4.6 Configuración y exploración de protocolo FTP}
+
+\section{Pruebas de Conectividad (Comando ping) y Exploración del Protocolo DNS}
+\section{Configuración y Exploración del servidor WEB}
+%==============================================================
+%==================  SECCION 4.2   =======================
+%==============================================================
+\section{Configuración y exploración de los protocolos de correo electrónico SMTP y POP3}
+En esta sección del laboratorio, realizamos la configuración y validación de servicios de email en la red simulada. Para lograrlo, activamos SMTP y POP3 en el servidor de email (192.168.1.34) para enviar emails de un cliente a otro y recuperar los emails en el cliente destino.
+\subsection{Configuración de email server}
+Configuramos el servidor de email para que no ofrezca servicios que no tengan que ver con email. Habilitamos el servicio SMTP que escucha en el puerto 25 y funciona para que los clientes puedan enviar emails. También habilitamos el servicio POP3 que escucha en el puerto 110 y funciona para que los clientes puedan recibir emails. Juntos, estos protocolos completan el ciclo de comunicación por email. Adicionalmente, se agregaron usuarios y contraseñas para cada miembro del grupo. Estas credenciales sirven para autenticar a cada cliente al enviar (SMTP) y recibir (POP3) mensajes, asegurando que cada usuario solamente tenga acceso a su propio mailbox.
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{lab-01-screenshots/45-1-email-config.png}
+    \caption{Configuracion de email server}
+\end{figure}
+
+
+\subsection{Prueba de conectividad al email server}
+En este paso se realizó una prueba de conectividad para asegurar que el servidor de email sea alcanzable desde las máquinas de los clientes. Si el cliente que realiza el \textbf{ping} obtiene respuestas, significa que el enrutamiento entre la subred del usuario y la subred del servidor de email está correcto.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{lab-01-screenshots/45-2-ping-email}
+    \caption{\textbf{ping} al email server}
+\end{figure}
+
+Esta prueba es importante ya que SMTP ni POP3 van a funcionar correctamente si falla el ping, ya que esos protocolos de la capa de aplicación dependen de que la conexión TCP esté funcionando.
+
+\subsection{Configuración de emails en maquinas de cliente}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{lab-01-screenshots/45-3-client-config.png}
+    \caption{Configuración cliente email para a.ortizg}
+\end{figure}
+
+Después de verificar que sea posible establecer una conexión entre los clientes y el servidor de email, configuramos a cada usuario en las máquinas de los clientes con su respectivo email, contraseña, y la información del servidor de email. Esta configuración le deja saber al servidor de email quién es el usuario y a dónde debe dirigir correos destinados a un usuario en particular.
+
+\subsection{Envío y recepción de correos entre clientes}
+Al realizar las configuraciones de los clientes, podemos enviar un mensaje de un cliente a otro. A continuacion describimos los pasos para realizar esta comunicacion:
+\begin{enumerate}
+\item \textit{a.ortizg} escribe un mensaje para \textit{j.quirogar}
+\item Por medio de SMTP \textit{a.ortizg} manda el mensaje al email server
+\item El email server lo recibe y lo mete en el buzón de \textit{j.quirogar}
+\item Cuando el cliente de \textit{j.quirogar} revisa su buzón, se conecta con POP3, se autentica, y descarga el mensaje
+\item El mensaje es mercado para eliminacioón del email server (si se elimina del cliente, desaparece para siempre)
+\end{enumerate}
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{lab-01-screenshots/45-4-send-receive.png}
+    \caption{Enviando/recibiendo un email}
+\end{figure}
+
+
+\section{Configuración y exploración de protocolo FTP}
+
 
 \end{document}
