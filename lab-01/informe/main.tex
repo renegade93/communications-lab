@@ -265,7 +265,94 @@ Gracias a esta configuración, al realizar pruebas desde los clientes se logró 
 %==============================================================
 
 \section{4.3 Pruebas de Conectividad (Comando ping) y Exploración del Protocolo DNS}
+
+Para este punto vamos a probar la correcta conectividad de los equipos de los clientes y, sobretodo, verificaremos el correcto funcionamiento del servidor DNS, esto a traves del comando \textbf{ping} mostrandonos el tiempo de respuesta del servidor y si es accesible o no.
+
+\subsection{Obtener direcciones ip usuarios}
+Se hallaron las ip de los 4 usuarios, haciendo uso del comando \textbf {ipconfig}, asi como lo muestra la figura 5, la cual muestra la ejecución de este comando para el usuario 1.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{lab-01-screenshots/43 ipconfig.png}
+    \caption{Ejecucion ipconfig en la maquina de usuario 1.}
+\end{figure}
+ Tambien adjuntamos las ip halladas usando el comando de \textbf{ipconfig} para los 4 usuarios
+\begin{itemize}
+    \item \texttt{Usuario 1} $\rightarrow$ 192.168.0.101
+    \item \texttt{Usuario 2} $\rightarrow$ 192.168.0.100
+    \item \texttt{Usuario 3} $\rightarrow$ 192.168.0.102
+    \item \texttt{Usuario 4} $\rightarrow$ 192.168.0.103
+\end{itemize}
+\subsection{Prueba ping a los diferentes usuarios}
+A continuacion haremos uso del comando ping desde el usuario 1 hacia los demas usuarios para verficar la correcta conexion de todos los usuarios a la red. Esto usuando el comando \textbf {ping} como se muestra a continuación.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{lab-01-screenshots/43 -2-ping-local.png}
+    \caption{Ping desde usuario 1 a los demas dispositivos conectados en la parte de la red de clientes.}
+\end{figure}
+Como se ve en la figura 6, usando el comando \textbf {ping}, no solo encontramos que los otros 3 usuarios estan en linea, sino tambien pudimos encontrar que el servidor DHCP tambien nos devlvio una respuesta, al igual que el "Router Clientes".
+
+\subsection{Ping al servidor web}
+Seguiremos con un ping al servidor web, el cual cuenta con la dirección ip estatica 192.168.1.35. Como podremos observar en la figura 6 contaremos con una respuesta positiva por parte del servidor.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{lab-01-screenshots/43-2-ping-web.png}
+    \caption{Ping desde usuario 1 al servidor web.}
+\end{figure}
+En la figura 7 tambien podemos observar que el primer paquete de bytes se pierde, esto se da porque para el primer paquete no se ha enrutado con el MAC del servidor y no se logra dar una respuesta a tiempo, cosa que no sucede para el resto de los paquetes.
+\subsection{Ping web.labredes.com}
+Vamos entonces a hacer una prueba de conectividad al servidor web y al mismo tiempo, una prueba del correcto funcionamiento del servidor dns, el cual permite que al hacer ping a \textit {web.labredes.com} y que este se conecte a la ip de nuestro servidor. 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{lab-01-screenshots/43-3-ping-web.png}
+    \caption{Ping desde usuario 1 al servidor web usando su url.}
+\end{figure}
+Como vemos en la figura 8, tenemos que la respuesta del ping es favorable, y ademas, responde desde la IP estatica que configuramos para nuestro servidor web, demostrando asi que el servidor \textbf {DNS} quedo correctamente configurado.
+\subsection{Ejecutar nslookup}
+\textbf{nslookup} es un comando que nos dice la direccion IP asociada a cierto dominio, el servidor donde esta alojado y la direccion IP del mismo. 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{lab-01-screenshots/43-4-nslookup.png}
+    \caption{Ejecucion del comando nslookup.}
+\end{figure}
+Como vemos en la figura 9 el comando \textbf{nslookup} no solo nos dice la informacion de un servidor, sino que tambien nos puede decir si cierto dominio es inexistente. Util para hallar informacion a cerca de los servidores asociados a un dominio o para solucionar problemas que puedan estar relacionados al DNS.
 \section{4.4 Configuración y Exploración del servidor WEB}
+Para esta punto del laboratorio buscaremos configurar el servidor web, con los protocolos \textit{HTTP y HTTPS} Teniendo en cuenta que, como vimos en los puntos anteriores, ya hemos configurado el DNS y su IP para asegurar su correcto funcionamiento.
+\subsection{Habilitar servicios HTTP y HTTPS}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{lab-01-screenshots/44-1-config-server.png}
+    \caption{Ejecucion del comando nslookup.}
+\end{figure}
+En la figura 10 podemos ver como activamos los servicios de web (\textit{HTTP y HTTPS}) para poder acceder por medio de las tecnologias web, como un buscador, a las diferentes paginas que se tengan cargadas en el servidor.
+\subsection{Creacion de paginas de presentacion}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{lab-01-screenshots/44-1-presentacion.png}
+    \caption{Pagina de presentacion Esteban Quiroga.}
+\end{figure}
+En la figura 11 vemos la pagina de presentacion para el compañero Esteban Quiroga, donde se ven sus intereses, gustos musicales, entre otros.
+\subsection{Pruebas de conectividad servicios HTTP y HTTPS}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{lab-01-screenshots/44-2-prueba.png}
+    \caption{Prueba de conexion servidor web.}
+\end{figure}
+En la figura 12 podemos ver la respuesta positiva usando el comando \textit{ping} para el servidor, tanto usando su IP, como usando su correspondiente URL.
+\subsection{Prueba de conexion HTTP usando el buscador}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{lab-01-screenshots/44-2-andy-profile.png}
+    \caption{Prueba de conexion exitosa usando HTTP.}
+\end{figure}
+En la figura 13 podemos ver como la conexion al servidor web fue exitosa usando el protocolo web HTTP, pues la pagina de perfil de Andy cargo correctamente usando este protocolo.
+\subsection{Prueba de conexion HTTP usando el buscador}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{lab-01-screenshots/44-3-https.png}
+    \caption{Prueba de conexion exitosa usando HTTPS.}
+\end{figure}
+En la figura 14 podemos ver como la conexion al servidor web fue exitosa usando el protocolo web HTTPS, pues la pagina \textit{index} cargo exitosamente, demostrando asi con el paso anterior que ambos servicios estan en linea y funcionando segun lo esperado.
+
 \section{4.5 Configuración y exploración de los protocolos de correo electrónico SMTP y POP3}
 \section{4.6 Configuración y exploración de protocolo FTP}
 
