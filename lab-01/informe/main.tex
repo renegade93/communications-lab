@@ -280,7 +280,7 @@ Se hallaron las ip de los 4 usuarios, haciendo uso del comando \textbf {ipconfig
     \item \texttt{Usuario 1} $\rightarrow$ 192.168.0.101
     \item \texttt{Usuario 2} $\rightarrow$ 192.168.0.100
     \item \texttt{Usuario 3} $\rightarrow$ 192.168.0.102
-    \item \texttt{Usuario4} $\rightarrow$ 192.168.0.103
+    \item \texttt{Usuario 4} $\rightarrow$ 192.168.0.103
 \end{itemize}
 \subsection{Prueba ping a los diferentes usuarios}
 A continuacion haremos uso del comando ping desde el usuario 1 hacia los demas usuarios para verficar la correcta conexion de todos los usuarios a la red. Esto usuando el comando \textbf {ping} como se muestra a continuación.
@@ -299,7 +299,7 @@ Seguiremos con un ping al servidor web, el cual cuenta con la dirección ip esta
     \caption{Ping desde usuario 1 al servidor web.}
 \end{figure}
 En la figura 7 tambien podemos observar que el primer paquete de bytes se pierde, esto se da porque para el primer paquete no se ha enrutado con el MAC del servidor y no se logra dar una respuesta a tiempo, cosa que no sucede para el resto de los paquetes.
-\subsection{ping web.labredes.com}
+\subsection{Ping web.labredes.com}
 Vamos entonces a hacer una prueba de conectividad al servidor web y al mismo tiempo, una prueba del correcto funcionamiento del servidor dns, el cual permite que al hacer ping a \textit {web.labredes.com} y que este se conecte a la ip de nuestro servidor. 
 \begin{figure}[H]
     \centering
@@ -308,7 +308,7 @@ Vamos entonces a hacer una prueba de conectividad al servidor web y al mismo tie
 \end{figure}
 Como vemos en la figura 8, tenemos que la respuesta del ping es favorable, y ademas, responde desde la IP estatica que configuramos para nuestro servidor web, demostrando asi que el servidor \textbf {DNS} quedo correctamente configurado.
 \subsection{Ejecutar nslookup}
-\textit{Nslookup} es un comando que nos dice la direccion IP asociada a cierto dominio, el servidor donde esta alojado y la direccion IP del mismo. 
+\textbf{nslookup} es un comando que nos dice la direccion IP asociada a cierto dominio, el servidor donde esta alojado y la direccion IP del mismo. 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.65\textwidth]{lab-01-screenshots/43-4-nslookup.png}
@@ -331,7 +331,7 @@ En la figura 10 podemos ver como activamos los servicios de web (\textit{HTTP y 
     \caption{Pagina de presentacion Esteban Quiroga.}
 \end{figure}
 En la figura 11 vemos la pagina de presentacion para el compañero Esteban Quiroga, donde se ven sus intereses, gustos musicales, entre otros.
-\subsection{pruebas de conectividad servicios HTTP y HTTPS}
+\subsection{Pruebas de conectividad servicios HTTP y HTTPS}
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.65\textwidth]{lab-01-screenshots/44-2-prueba.png}
