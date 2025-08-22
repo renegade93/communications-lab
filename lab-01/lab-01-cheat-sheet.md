@@ -1,7 +1,3 @@
-Perfect 🔥 — let’s expand your **defense cheat sheet** so that each section has a **theory note**, just like you asked for the subnet masks. This way you’ll be prepared to answer both *“what did you do?”* and *“why/how does it work?”* in the defense.
-
----
-
 # 📑 Full Lab Defense Cheat Sheet (with embedded theory)
 
 ---
@@ -109,18 +105,3 @@ Perfect 🔥 — let’s expand your **defense cheat sheet** so that each sectio
   4. Runs `dir` to list files.
   5. Runs `get filename` → server opens data channel, sends file → client saves it locally.
 * **Verification**: Screenshots of ping, login, `dir`, and successful `get`.
-
----
-
-## 🔑 Quick Recap
-
-For **defense questions**, always frame answers like this:
-
-* **Protocol & Port** (e.g., SMTP = TCP/25).
-* **Purpose** (send, receive, translate names, transfer files).
-* **Theory** (how it works under the hood).
-* **Verification** (command you ran + screenshot you got).
-
----
-
-👉 Do you want me to make this into a **visual diagram (one-page flow: DNS, Web, Email, FTP all mapped on TCP/IP stack)** so you can also explain visually how each service sits on the model?
