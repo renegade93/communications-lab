@@ -14,3 +14,6 @@
 \contentsline {subsection}{\numberline {4.5.3}Configuración de emails en maquinas de cliente}{6}{subsection.5.3}%
 \contentsline {subsection}{\numberline {4.5.4}Envío y recepción de correos entre clientes}{7}{subsection.5.4}%
 \contentsline {section}{\numberline {4.6}Configuración y exploración de protocolo FTP}{7}{section.6}%
+\contentsline {subsection}{\numberline {4.6.1}Configuración de usuarios en el FTP server}{8}{subsection.6.1}%
+\contentsline {subsection}{\numberline {4.6.2}Prueba de conectividad al FTP server}{8}{subsection.6.2}%
+\contentsline {subsection}{\numberline {4.6.3}Conexión y descarga de archvios al FTP server}{8}{subsection.6.3}%

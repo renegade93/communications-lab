@@ -324,5 +324,34 @@ Al realizar las configuraciones de los clientes, podemos enviar un mensaje de un
 
 \section{Configuración y exploración de protocolo FTP}
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{lab-01-screenshots/46-1-ftp-config}
+    \caption{Configuración de FTP server}
+\end{figure}
+
+\subsection{Configuración de usuarios en el FTP server}
+
+Para lograr el envió de archivos entre cliente y servidor en nuestra red simulada, configuramos el FTP server. FTP funciona con dos canales: El canal de control (port 21) donde el cliente manda comandos y el servidor responde y el canal de datos (port 20) donde el contenido del archivo se mueve. En la figura 9 se ven las credenciales de los usuarios del FTP server.
+
+
+\subsection{Prueba de conectividad al FTP server}
+De forma similar a la prueba de conectividad al email server, también realizamos las prueba para el FTP server. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{lab-01-screenshots/46-2-ping-ftp}
+    \caption{\textbf{ping} al FTP server}
+\end{figure}
+
+\subsection{Conexión y descarga de archvios al FTP server}
+Para que un cliente configurado pueda descargar archivos del FTP server se conecta por medio del comando \textbf{ftp ftp.labredes.com}.El cliente luego corre \textbf{dir} y el servidor responde con la lista de archivos disponibles. El cliente luego realiza un GET paraindicarle al servidor que tiene que enviar el archvio. El servidor establece una   conexión separada para los datos en puerto 20 mientras que el canal de control permanece abierto. El servidor luego lee el archivo de almacenamiento y manda el contenido del archivo al cliente en un bit stream sobre el canal de datos. TCP se asegura de que el archivo llegue intacto. El cliente escribe los bits de llegada en un archivo locval nuevo y completa la descarga. Cuando se acaba la transferencia, el servidor cierra el canal de datos pero deja abierto el canal de control para recibir otro comando. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.65\textwidth]{lab-01-screenshots/46-3-get-ftp}
+    \caption{Menu de FTP server y descarga de archivo}
+\end{figure}
+
 
 \end{document}
