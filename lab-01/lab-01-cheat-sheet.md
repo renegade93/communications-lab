@@ -1,4 +1,4 @@
-# 📑 Lab Defense Cheat Sheet 
+# 📑 Lab Defense Cheat Sheet (with embedded theory)
 
 ---
 
@@ -17,6 +17,22 @@
   * `255.255.255.0` = `/24`, 254 hosts.
   * Devices with the same network bits can talk directly.
   * Routers use masks for forwarding decisions.
+
+The last 8 bits give 2^8 = 256 possible combinations (0-255), but two addresses are reserved:
+
+  Reserved addresses:
+  - Network address: All host bits = 0 (e.g., 192.168.1.0)
+  - Broadcast address: All host bits = 1 (e.g., 192.168.1.255)
+
+  Available for hosts:
+  - 256 total - 2 reserved = 254 usable host addresses
+  - Range: 192.168.1.1 to 192.168.1.254
+
+  This pattern applies to all subnet sizes:
+  - /30 (2 host bits): 4 total - 2 reserved = 2 hosts
+  - /16 (16 host bits): 65,536 total - 2 reserved = 65,534 hosts
+
+  The network and broadcast addresses have special functions and cannot be assigned to individual devices.
 * **Verification**: `ipconfig` on clients, manual config on servers.
 
 ---
