@@ -227,79 +227,174 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed nec tristique eros.
 \section{Análisis del protocolo HTTPS realizando navegación en el sitio de YouTube}
 
 \subsection{Navegación en YouTube}
-Se realizó la captura de tráfico mientras se navegaba en el sitio \textbf{https://www.youtube.com/}. 
-Para reducir interferencias, se mantuvo una única pestaña activa en el navegador. 
-Además, se inició sesión con una cuenta de Gmail y se realizaron acciones como la visualización de videos y la publicación de comentarios. 
-La captura se guardó con el nombre \texttt{YouTube\_view.pcapng}.
+Se realizó la captura de tráfico mientras se navegaba en \textbf{https://www.youtube.com/}. 
+Para reducir interferencias, se mantuvo una única pestaña activa en el navegador; se inició sesión con cuenta de Google y se realizaron acciones de navegación/comentarios. 
+La captura se guardó como \texttt{YouTube\_view.pcapng}.
 
 \begin{itemize}
-    \item \textbf{Filtro aplicado:} \texttt{tcp.port == 443}
-    \item \textbf{Capa de aplicación:} Se identificaron protocolos TLS 1.2 y TLS 1.3 con mensajes como \textit{Client Hello}, \textit{Server Hello}, \textit{Certificate} y \textit{Application Data}. Estos forman parte del \textit{handshake TLS} y del intercambio de datos cifrados.
-    \item \textbf{Capa de transporte:} Se utilizó el protocolo \textbf{TCP}, que asegura confiabilidad en la comunicación.
-    \item \textbf{Puertos:} El puerto destino fue el estándar \textbf{443 (HTTPS)} y los puertos de origen fueron dinámicos (efímeros), variando en cada sesión.
-    \item \textbf{Servidores (SNI):} Se evidenciaron dominios de Google asociados a YouTube como \texttt{youtube.com}, \texttt{googlevideo.com} y \texttt{ytimg.com}.
+    \item \textbf{Filtro aplicado en Wireshark:} \texttt{tcp.port == 443}.
+    \item \textbf{Capa de aplicación (TLS):} Se observan mensajes del \textit{handshake TLS} (\textit{Client Hello}, \textit{Server Hello}, \textit{Certificate}) y posteriormente \textit{Application Data}, que corresponde a tráfico HTTP cifrado.
+    \item \textbf{Capa de transporte (TCP):} HTTPS se ejecuta sobre TCP, lo que provee fiabilidad mediante control de flujo, numeración de secuencia y \textit{ACKs}.
+    \item \textbf{Puertos:} Destino \textbf{443} (HTTPS) y puertos de origen efímeros.
+    \item \textbf{SNI/servidores:} \texttt{youtube.com}, \texttt{accounts.youtube.com} y dominios relacionados.
 \end{itemize}
 
-\noindent
-\textbf{Conclusiones:} Todo el tráfico de YouTube viaja cifrado mediante TLS, garantizando la confidencialidad de la comunicación. 
-El uso de múltiples dominios de Google refleja la distribución de contenidos (streaming de video, recursos multimedia, etc.). 
-El tráfico aparece como \textit{Application Data}, confirmando que no es posible acceder al contenido real debido al cifrado.
+\noindent\textbf{Conclusión (YouTube):} 
+El tráfico está protegido mediante TLS (1.2/1.3). 
+El contenido de peticiones/respuestas HTTP no es visible (aparece como \textit{Application Data}), garantizando confidencialidad e integridad.
 
 %--------------------------------------------------------------
-
 \subsection{Navegación en otros sitios HTTPS}
-Se realizó una segunda captura al visitar diferentes portales colombianos y académicos, guardada como \texttt{HTTPS\_view.pcapng}.
+Se realizó una segunda captura visitando: \textbf{www.elespectador.com}, \textbf{www.eltiempo.com}, \textbf{www.uniandes.edu.co} y \textbf{www.bancolombia.com} (\texttt{HTTPS\_view.pcapng}). 
+En todos los casos se evidenció \textbf{TLS} sobre \textbf{TCP/443}, con presencia de \textit{Client Hello}/\textit{Server Hello}/\textit{Application Data}.
 
-\subsubsection{https://www.elespectador.com}
-El análisis mostró conexiones TLS (1.2 y 1.3) sobre el puerto 443 utilizando TCP como protocolo de transporte. 
-La información de aplicación corresponde a \textit{handshake TLS} y \textit{Application Data}. 
-El tráfico se mantiene cifrado en todo momento.
-
-\subsubsection{https://www.eltiempo.com}
-Similar a \textit{El Espectador}, se evidenció el uso de TLS sobre TCP, puerto 443. 
-Los paquetes de aplicación muestran únicamente intercambio de certificados y datos cifrados. 
-El sitio garantiza confidencialidad en la comunicación.
-
-\subsubsection{https://www.uniandes.edu.co}
-El portal de la Universidad de los Andes utiliza también HTTPS con TLS 1.2/1.3. 
-La captura evidencia el proceso de \textit{handshake TLS} y la posterior transmisión de datos cifrados bajo \textit{Application Data}. 
-Esto asegura la protección de información académica y de los usuarios.
-
-\subsubsection{https://www.bancolombia.com}
-La conexión al portal bancario utiliza \textbf{TLS 1.3} sobre TCP/443, garantizando un nivel de seguridad reforzado debido a la naturaleza sensible de la información financiera. 
-Todos los datos observados corresponden a mensajes TLS cifrados. 
-Esto valida que el tráfico cumple con los estándares de seguridad exigidos en el sector bancario.
-
-\noindent
-\textbf{Conclusiones generales:} 
-En todos los portales analizados, el tráfico de red se ejecuta mediante el protocolo HTTPS sobre TCP/443, con versiones TLS 1.2 y 1.3. 
-La capa de aplicación muestra únicamente información relacionada con el protocolo TLS y no expone contenido en claro. 
-Esto confirma que los mecanismos de seguridad actuales protegen efectivamente la confidencialidad e integridad de la comunicación entre cliente y servidor.
+\noindent\textbf{Conclusión (otros sitios):}
+Todos emplean HTTPS; se identificaron versiones TLS 1.2/1.3 según el host. 
+El cifrado impide visualizar el contenido HTTP en claro.
 
 %==============================================================
 %=====================   Flujos   =============================
 %==============================================================
-
 \subsection*{Representación gráfica de flujos}
-
-Para complementar el análisis, se generaron diagramas de flujo en Wireshark que muestran la interacción entre el cliente y los servidores durante la navegación. 
-Estos flujos permiten observar de manera visual el establecimiento de las conexiones, los intercambios de datos cifrados y los cierres de sesión.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.95\textwidth]{lab-02-screenshots/8.5-YouTube-flow.png}
-    \caption{Flujo de comunicación durante la navegación en YouTube. 
-    Se observan múltiples paquetes \texttt{Application Data} correspondientes al tráfico de video en streaming, así como respuestas TCP de control (\texttt{ACK}). 
-    El diagrama refleja conexiones hacia diferentes direcciones IP asociadas a servidores de Google y YouTube.}
+    \caption{Flujo de comunicación durante la navegación en YouTube. Se aprecian múltiples \texttt{Application Data} (tráfico cifrado) y \texttt{ACKs} propios de TCP hacia distintos hosts de Google/YouTube.}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.95\textwidth]{lab-02-screenshots/8.5-HTTPS-flow.png}
-    \caption{Flujo de comunicación durante la navegación en otros sitios HTTPS (El Espectador, El Tiempo, Uniandes y Bancolombia). 
-    El diagrama muestra el proceso de establecimiento de conexión (\texttt{SYN}, \texttt{ACK}), seguido del intercambio de datos cifrados mediante TLS 1.2 y 1.3. 
-    Destaca la aparición de mensajes \texttt{Client Hello} que evidencian el inicio del \textit{handshake TLS}, así como varios paquetes de \texttt{Application Data} que corresponden a la carga de contenido.}
+    \caption{Flujo durante la navegación en sitios HTTPS (El Espectador, El Tiempo, Uniandes y Bancolombia). Se observa el establecimiento de conexión (SYN/SYN-ACK/ACK) y el posterior \textit{handshake TLS} (por ejemplo, \textit{Client Hello}).}
 \end{figure}
+
+%==============================================================
+%=================== Evidencia de Capas =======================
+%==============================================================
+\subsection*{Análisis de la Capa de Aplicación (TLS)}
+
+Durante el \textit{handshake TLS}, el cliente envía un \texttt{Client Hello} indicando versiones soportadas (TLS 1.2/1.3), \textit{cipher suites} y el nombre del servidor (\textit{SNI}). 
+El servidor responde con \texttt{Server Hello} seleccionando parámetros criptográficos y entrega su \textit{Certificate} (X.509) para autenticación. 
+Tras la negociación de claves, la sesión opera con \texttt{Application Data} (HTTP cifrado).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{lab-02-screenshots/8.5-CapaAplicacion-HTTPS.png}
+    \caption{\texttt{Client Hello} hacia \texttt{www.uniandes.edu.co}. Se observan extensiones TLS (p.\,ej., \textit{supported\_versions}, \textit{server\_name}).}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{lab-02-screenshots/8.5-CapaAplicacion-Youtube.png}
+    \caption{\texttt{Client Hello} hacia \texttt{accounts.youtube.com}. Se evidencia el uso de TLS 1.2/1.3, \textit{cipher suites} ofrecidas y el SNI del host.}
+\end{figure}
+
+\noindent\textit{Implicación:} la capa de aplicación expone la negociación TLS, pero el contenido HTTP queda cifrado.
+
+%--------------------------------------------------------------
+\subsection*{Análisis de la Capa de Transporte (TCP)}
+
+HTTPS requiere de TCP para asegurar fiabilidad (entrega ordenada, control de congestión) y se inicia con el \textit{three-way handshake} (SYN, SYN-ACK, ACK). 
+En las capturas se aprecian campos como puertos origen/destino, números de secuencia, ventana y flags (\texttt{PSH}, \texttt{ACK}), además del \textit{payload} que TLS cifra.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{lab-02-screenshots/8.5-CapaTransporte-HTTPS.png}
+    \caption{Detalle TCP hacia \texttt{www.bancolombia.com}: puertos, números de secuencia/ack, ventana y \texttt{TCP payload} (transportado por TLS).}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{lab-02-screenshots/8.5-CapaTransporte-Youtube.png}
+    \caption{Paquete TCP en conexión a YouTube mostrando longitud de segmento, flags y \texttt{TCP payload}; el contenido de aplicación va cifrado por TLS.}
+\end{figure}
+
+%==============================================================
+%=================== Evidencia por Sitio ======================
+%==============================================================
+\subsection*{Evidencia de paquetes HTTPS por sitio web}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{lab-02-screenshots/8.5-HTTPS-bancolombia.png}
+    \caption{\texttt{Client Hello} hacia \texttt{www.bancolombia.com} (TLS 1.3). Evidencia del inicio del \textit{handshake} y establecimiento de un canal cifrado adecuado para datos financieros.}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{lab-02-screenshots/8.5-HTTPS-elespectador.png}
+    \caption{Conexión a \texttt{www.elespectador.com}. Se visualiza \texttt{Client Hello} (TLS 1.2) y, a continuación, \texttt{Application Data} (HTTP sobre TLS).}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{lab-02-screenshots/8.5-HTTPS-eltiempo.png}
+    \caption{Tráfico hacia \texttt{www.eltiempo.com}: \texttt{Client Hello} en TLS 1.3 seguido de \texttt{Server Hello}/\texttt{Change Cipher Spec} y \texttt{Application Data}.}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{lab-02-screenshots/8.5-HTTPS-uniandes.png}
+    \caption{Tráfico hacia \texttt{www.uniandes.edu.co}. Evidencia de \texttt{Client Hello} con SNI del host y negociación de versiones/cifrados.}
+\end{figure}
+
+%--------------------------------------------------------------
+\subsection*{Evidencia de paquetes en YouTube}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{lab-02-screenshots/8.5-Packets-Youtube.png}
+    \caption{Listado filtrado por \texttt{tcp.port == 443} con conexiones a \texttt{youtube.com}. Se observan \textit{handshake TLS} y posteriormente \texttt{Application Data}.}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{lab-02-screenshots/8.5-Paquete-Youtube.png}
+    \caption{Detalle de un paquete TLS asociado a YouTube: la capa de aplicación aparece como \texttt{Application Data}, confirmando el cifrado del contenido HTTP.}
+\end{figure}
+
+%==============================================================
+%======================= Tablas (opc) =========================
+%==============================================================
+\subsection*{Ejemplos de paquetes (tabla)}
+% Requiere \usepackage{array} si deseas columnas con p{..}
+\begin{table}[H]
+\centering
+\caption{Ejemplos representativos de paquetes capturados (YouTube)}
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+\textbf{Fuente} & \textbf{Destino} & \textbf{Protocolo} & \textbf{Puerto Origen} & \textbf{Puerto Destino} \\
+\hline
+192.168.1.13 & \textit{YouTube/Google IP} & TCP (TLS 1.3) & \textit{efímero} & 443 \\
+192.168.1.13 & \textit{YouTube/Google IP} & TCP (TLS 1.2) & \textit{efímero} & 443 \\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Ejemplos representativos de paquetes (otros sitios HTTPS)}
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+\textbf{Fuente} & \textbf{Destino} & \textbf{Protocolo} & \textbf{Puerto Origen} & \textbf{Puerto Destino} \\
+\hline
+192.168.1.13 & \textit{bancolombia.com (IP)} & TCP (TLS 1.3) & \textit{efímero} & 443 \\
+192.168.1.13 & \textit{uniandes.edu.co (IP)} & TCP (TLS 1.2/1.3) & \textit{efímero} & 443 \\
+\hline
+\end{tabular}
+\end{table}
+
+%==============================================================
+%==================== Cierre/Análisis =========================
+%==============================================================
+\subsection*{Conclusiones generales}
+\begin{itemize}
+    \item HTTPS combina HTTP con TLS sobre TCP/443, garantizando \textbf{confidencialidad}, \textbf{integridad} y \textbf{autenticación} del servidor mediante certificados X.509.
+    \item Las capturas muestran el \textbf{handshake TLS} (\texttt{Client Hello}, \texttt{Server Hello}, \texttt{Certificate}) seguido de \texttt{Application Data} (HTTP cifrado), por lo cual el contenido de aplicación no es legible.
+    \item El uso de TCP evidencia control de fiabilidad (SYN/SYN-ACK/ACK, números de secuencia, ventanas y \texttt{ACKs}).
+    \item En YouTube se observan múltiples flujos cifrados (\texttt{Application Data}) por la naturaleza de \textit{streaming} y recursos; en los demás sitios se confirma el mismo patrón de seguridad.
+\end{itemize}
 
 
 
