@@ -1,0 +1,26 @@
+\babel@toc {english}{}\relax 
+\contentsline {section}{Introducción}{3}{section*.1}%
+\contentsline {section}{\numberline {8.1}Prueba ping}{3}{section.1}%
+\contentsline {subsection}{\numberline {8.1.1}Prueba de conectividad al servidor DNS}{4}{subsection.1.1}%
+\contentsline {subsection}{\numberline {8.1.2}Prueba de conectividad al servidor FTP}{4}{subsection.1.2}%
+\contentsline {section}{\numberline {8.1}Análisis de tráfico del Servicio DNS}{4}{section.1}%
+\contentsline {subsection}{\numberline {8.1.1}Prueba de conectividad al Servidor Web (IP)}{4}{subsection.1.1}%
+\contentsline {subsection}{\numberline {8.1.2}Prueba de conectividad al Servidor Web (URL)}{4}{subsection.1.2}%
+\contentsline {section}{\numberline {8.1}Análisis de tráfico del Servicio FTP}{4}{section.1}%
+\contentsline {subsection}{\numberline {8.1.1}Conexión al servidor FTP}{4}{subsection.1.1}%
+\contentsline {subsection}{\numberline {8.1.2}Descarga de archivo (Download)}{4}{subsection.1.2}%
+\contentsline {subsection}{\numberline {8.1.3}Carga de archivo (Upload)}{4}{subsection.1.3}%
+\contentsline {section}{\numberline {8.1}Análisis de tráfico del Servicio Web}{4}{section.1}%
+\contentsline {subsection}{\numberline {8.1.1}Acceso al servidor web mediante HTTP}{4}{subsection.1.1}%
+\contentsline {section}{\numberline {8.1}Análisis del protocolo HTTPS realizando navegación en el sitio de YouTube}{4}{section.1}%
+\contentsline {subsection}{\numberline {8.1.1}Navegación en YouTube}{4}{subsection.1.1}%
+\contentsline {subsection}{\numberline {8.1.2}Navegación en otros sitios HTTPS}{4}{subsection.1.2}%
+\contentsline {subsubsection}{\numberline {8.1.2.1}https://www.elespectador.com}{4}{subsubsection.1.2.1}%
+\contentsline {subsubsection}{\numberline {8.1.2.2}https://www.eltiempo.com}{4}{subsubsection.1.2.2}%
+\contentsline {subsubsection}{\numberline {8.1.2.3}https://www.uniandes.edu.co}{4}{subsubsection.1.2.3}%
+\contentsline {subsubsection}{\numberline {8.1.2.4}https://www.bancolombia.com}{4}{subsubsection.1.2.4}%
+\contentsline {section}{\numberline {8.1}Análisis del protocolo VoIP}{4}{section.1}%
+\contentsline {subsection}{\numberline {8.1.1}Establecimiento de la llamada}{4}{subsection.1.1}%
+\contentsline {section}{\numberline {8.1}Análisis del protocolo RTMP}{4}{section.1}%
+\contentsline {subsection}{\numberline {8.1.1}Inicio de la transmisión}{4}{subsection.1.1}%
+\contentsline {section}{\numberline {9.1}Topología}{4}{section.1}%
