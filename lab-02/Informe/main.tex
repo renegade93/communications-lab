@@ -225,12 +225,82 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed nec tristique eros.
 %==============================================================
 \renewcommand{\thesection}{8.\arabic{section}}
 \section{Análisis del protocolo HTTPS realizando navegación en el sitio de YouTube}
+
 \subsection{Navegación en YouTube}
+Se realizó la captura de tráfico mientras se navegaba en el sitio \textbf{https://www.youtube.com/}. 
+Para reducir interferencias, se mantuvo una única pestaña activa en el navegador. 
+Además, se inició sesión con una cuenta de Gmail y se realizaron acciones como la visualización de videos y la publicación de comentarios. 
+La captura se guardó con el nombre \texttt{YouTube\_view.pcapng}.
+
+\begin{itemize}
+    \item \textbf{Filtro aplicado:} \texttt{tcp.port == 443}
+    \item \textbf{Capa de aplicación:} Se identificaron protocolos TLS 1.2 y TLS 1.3 con mensajes como \textit{Client Hello}, \textit{Server Hello}, \textit{Certificate} y \textit{Application Data}. Estos forman parte del \textit{handshake TLS} y del intercambio de datos cifrados.
+    \item \textbf{Capa de transporte:} Se utilizó el protocolo \textbf{TCP}, que asegura confiabilidad en la comunicación.
+    \item \textbf{Puertos:} El puerto destino fue el estándar \textbf{443 (HTTPS)} y los puertos de origen fueron dinámicos (efímeros), variando en cada sesión.
+    \item \textbf{Servidores (SNI):} Se evidenciaron dominios de Google asociados a YouTube como \texttt{youtube.com}, \texttt{googlevideo.com} y \texttt{ytimg.com}.
+\end{itemize}
+
+\noindent
+\textbf{Conclusiones:} Todo el tráfico de YouTube viaja cifrado mediante TLS, garantizando la confidencialidad de la comunicación. 
+El uso de múltiples dominios de Google refleja la distribución de contenidos (streaming de video, recursos multimedia, etc.). 
+El tráfico aparece como \textit{Application Data}, confirmando que no es posible acceder al contenido real debido al cifrado.
+
+%--------------------------------------------------------------
+
 \subsection{Navegación en otros sitios HTTPS}
+Se realizó una segunda captura al visitar diferentes portales colombianos y académicos, guardada como \texttt{HTTPS\_view.pcapng}.
+
 \subsubsection{https://www.elespectador.com}
+El análisis mostró conexiones TLS (1.2 y 1.3) sobre el puerto 443 utilizando TCP como protocolo de transporte. 
+La información de aplicación corresponde a \textit{handshake TLS} y \textit{Application Data}. 
+El tráfico se mantiene cifrado en todo momento.
+
 \subsubsection{https://www.eltiempo.com}
+Similar a \textit{El Espectador}, se evidenció el uso de TLS sobre TCP, puerto 443. 
+Los paquetes de aplicación muestran únicamente intercambio de certificados y datos cifrados. 
+El sitio garantiza confidencialidad en la comunicación.
+
 \subsubsection{https://www.uniandes.edu.co}
+El portal de la Universidad de los Andes utiliza también HTTPS con TLS 1.2/1.3. 
+La captura evidencia el proceso de \textit{handshake TLS} y la posterior transmisión de datos cifrados bajo \textit{Application Data}. 
+Esto asegura la protección de información académica y de los usuarios.
+
 \subsubsection{https://www.bancolombia.com}
+La conexión al portal bancario utiliza \textbf{TLS 1.3} sobre TCP/443, garantizando un nivel de seguridad reforzado debido a la naturaleza sensible de la información financiera. 
+Todos los datos observados corresponden a mensajes TLS cifrados. 
+Esto valida que el tráfico cumple con los estándares de seguridad exigidos en el sector bancario.
+
+\noindent
+\textbf{Conclusiones generales:} 
+En todos los portales analizados, el tráfico de red se ejecuta mediante el protocolo HTTPS sobre TCP/443, con versiones TLS 1.2 y 1.3. 
+La capa de aplicación muestra únicamente información relacionada con el protocolo TLS y no expone contenido en claro. 
+Esto confirma que los mecanismos de seguridad actuales protegen efectivamente la confidencialidad e integridad de la comunicación entre cliente y servidor.
+
+%==============================================================
+%=====================   Flujos   =============================
+%==============================================================
+
+\subsection*{Representación gráfica de flujos}
+
+Para complementar el análisis, se generaron diagramas de flujo en Wireshark que muestran la interacción entre el cliente y los servidores durante la navegación. 
+Estos flujos permiten observar de manera visual el establecimiento de las conexiones, los intercambios de datos cifrados y los cierres de sesión.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{lab-02-screenshots/8.5-YouTube-flow.png}
+    \caption{Flujo de comunicación durante la navegación en YouTube. 
+    Se observan múltiples paquetes \texttt{Application Data} correspondientes al tráfico de video en streaming, así como respuestas TCP de control (\texttt{ACK}). 
+    El diagrama refleja conexiones hacia diferentes direcciones IP asociadas a servidores de Google y YouTube.}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{lab-02-screenshots/8.5-HTTPS-flow.png}
+    \caption{Flujo de comunicación durante la navegación en otros sitios HTTPS (El Espectador, El Tiempo, Uniandes y Bancolombia). 
+    El diagrama muestra el proceso de establecimiento de conexión (\texttt{SYN}, \texttt{ACK}), seguido del intercambio de datos cifrados mediante TLS 1.2 y 1.3. 
+    Destaca la aparición de mensajes \texttt{Client Hello} que evidencian el inicio del \textit{handshake TLS}, así como varios paquetes de \texttt{Application Data} que corresponden a la carga de contenido.}
+\end{figure}
+
 
 
 %==============================================================
