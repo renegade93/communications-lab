@@ -353,9 +353,16 @@ En estas capturas no mostramos el hecho de que tenemos dos usuarios: "harry" y "
 %==============================================================
 \renewcommand{\thesection}{8.\arabic{section}}
 \section{Análisis de tráfico del Servicio Web}
-En esta parte exploramos el funcionamiento del servicio HTTPS dentro de la topología de red. Utilizando Wireshark, se capturan y analizan las peticiones y respuestas entre el cliente y el servidor web, lo que permite observar tráfico tráfico cifrado (HTTPS), así como identificar los puertos y protocolos de transporte utilizados.
-\subsection{Acceso al servidor web mediante HTTPS}
-En esta captura se observa primero la resolución DNS del dominio web.labredes31.com, donde el servidor retorna la dirección IP 172.20.10.5. A continuación, el cliente establece una conexión TCP con el servidor en el puerto 443 y realiza el handshake TLS, en el cual aparece el mensaje \textbf{Client Hello} con el SNI del dominio y la respuesta \textbf{Server Hello}. Tras este proceso, el tráfico pasa a mostrarse como Application Data cifrado, evidenciando que la comunicación HTTP se encapsula en HTTPS. Finalmente, la sesión se cierra mediante el intercambio de paquetes \textcolor{red}{FIN, ACK} y algunas retransmisiones propias del cierre de la conexión TCP.
+En esta sección se analiza el funcionamiento del protocolo HTTP dentro de la topología configurada. Mediante capturas en Wireshark, se observan las peticiones y respuestas entre el cliente y el servidor web en texto claro, lo que permite identificar directamente los encabezados y contenidos intercambiados, así como los puertos y el protocolo de transporte utilizados en la comunicación. El tráfico generado se capturó y se guardó en el archivo \textcolor{blue}{\texttt{Ping\_WEB\_view.pcap}}
+\subsection{Acceso al servidor web mediante HTTP}
+En esta captura se observa primero la resolución DNS de \textcolor{blue}{web.labredes31.com}. A continuación, el cliente establece una conexión TCP con el servidor en el puerto 80, completando el three-way handshake. Luego, el cliente envía una petición \textcolor{red}{GET / HTTP/1.1} y el servidor responde con \textcolor{red}{HTTP/1.1 200 OK}, entregando la página en plaintext. Luego el cliente solicita el recurso \textcolor{red}{/favicon.ico}, que también recibe una respuesta satisfactoria \textcolor{red}{200 OK}. Finalmente, la comunicación se cierra correctamente mediante el intercambio de mensajes \textcolor{red}{FIN, ACK}, completando así el ciclo típico de una sesión HTTP.
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\textwidth]{lab-02-screenshots/8.4-HTTP-flow}
+    \caption{Flow de HTTP}
+\end{figure}
 
 %==============================================================
 %=====================   8.5   ================================
