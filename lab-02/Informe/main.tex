@@ -557,7 +557,93 @@ En las capturas se aprecian campos como puertos origen/destino, números de secu
 \section{Análisis del protocolo VoIP}
 \subsection{Establecimiento de la llamada}
 
+Empezaremos describiendo como se establece la conexion entre el servidor y aquellos clientes que se conectan para establecer las llamadas. Para esto, se hace uso del protocolo de capa de aplicacion SIP (Session Initiation Protocol) por el cual utilizara codigos de estados, (muy parecido a como funciona en HTTP) para indicar si el cliente se le permite establecer conexion para poder realizar las llamadas. A continuacion podremos ver como funciona este proceso:
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{lab-02-screenshots/8.6-inicioLlamada.png}
+    \caption{Proceso de registro usando el protocolo SIP.}
+\end{figure}
+
+Aqui podemos ver como incialmente el cliente envia un request \textit{REGISTER} cuya respuesta es conexion con el servidor con el codigo de estatus \textit{401 Unauthorized}, esto porque introducimos una contraseña incorrecta; despues de esto se vuelve a intentar el registro del cliente, seguido por una respuesta de codigo de estado \textit{200 OK (REGISTER)}.
+\subsection*{Uso de la capa de aplicacion}
+Para el caso de las llamadas de aplicacion usadas por VoIP, solo tenemos el protocolo \textbf{SIP} utilizado para el registro de los clientes, su autorizacion y el manejo de sesion. A continuacion veremos mas a detalle el contenido de estos paquetes y los encabezados que utiliza.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{lab-02-screenshots/8.6-SIPDetail.png}
+    \caption{Detalle del uso del protocolo SIP.}
+\end{figure}
+
+Aqui vemos que utliza como metodo \textit{REGISTER} y que dentro del \textbf{header} tenemos: 
+\begin{itemize}
+    \item \textbf{Request-Line:} Indica el método SIP y la dirección del servidor al que se envía la petición. 
+    En este caso: \texttt{REGISTER sip:172.20.10.9;transport=UDP SIP/2.0}.
+    
+    \item \textbf{Method (REGISTER):} Es el tipo de solicitud SIP. \texttt{REGISTER} sirve para registrar un usuario en el servidor SIP.
+
+    \item \textbf{Request-URI:} Dirección (URI) del servidor SIP al cual se envía la petición de registro.
+
+    \item \textbf{Via:} Define la ruta de transporte usada (UDP, en este caso) e incluye la IP y puerto del cliente. 
+    También lleva el parámetro \texttt{branch} para identificar de forma única la transacción SIP.
+
+    \item \textbf{Max-Forwards:} Número máximo de saltos (hops) que el mensaje puede atravesar. Similar al TTL en IP.
+
+    \item \textbf{Contact:} Dirección de contacto del usuario (su ubicación actual, con IP y puerto) donde puede recibir llamadas.
+
+    \item \textbf{To:} Identifica la identidad (usuario SIP) que está siendo registrado en el servidor.
+
+    \item \textbf{From:} Dirección de origen del mensaje SIP. Incluye el identificador del usuario que hace el registro.
+
+    \item \textbf{Call-ID:} Identificador único de la sesión SIP. Sirve para distinguir distintas llamadas o registros.
+
+    \item \textbf{CSeq (Sequence):} Número de secuencia que combina un número incremental y el método (\texttt{REGISTER}).
+    Garantiza el orden correcto de los mensajes.
+
+    \item \textbf{Expires:} Tiempo (en segundos) que dura el registro antes de que expire y deba renovarse.
+
+    \item \textbf{Allow:} Lista de métodos SIP que soporta este cliente (ej. INVITE, BYE, CANCEL, MESSAGE).
+
+    \item \textbf{Supported:} Extensiones opcionales de SIP que el cliente entiende (ej. \texttt{replaces}, \texttt{timer}, \texttt{outbound}).
+
+    \item \textbf{User-Agent:} Información del software cliente utilizado (en este caso, Zoiper v2.10.20.4.1).
+
+    \item \textbf{Authorization:} Cabecera de autenticación digest. Contiene el usuario, realm, nonce y un hash de la contraseña
+    para validar credenciales contra el servidor.
+
+    \item \textbf{Allow-Events:} Tipos de eventos SIP que el cliente soporta para suscripciones (\texttt{presence}, \texttt{talk}, etc.).
+
+    \item \textbf{Content-Length:} Longitud del cuerpo del mensaje. Aquí es \texttt{0} porque este REGISTER no lleva cuerpo.
+\end{itemize}
+Finalmente, vale la pena mencionar que el protocolo utilizado por este puerto es el 5060. 
+\subsection{Durante la llamada}
+\subsection*{capa de transporte}
+Ahora bien, durante la llamada el protocolo que se usara para enviar los paquetes sera el de \textbf{UDP} pertenenciente a la capa de transporte, y como lo mencionamos anteriormente, \textbf{SIP} para el manejo de sesion, autorizacion y registro.  Es importante resaltar que en este tipo de servidores tambien se espera ver el uso del protocolo \textbf{RTP} para el transporte de los medios durante la llamada, sin embargo, en el caso de estas llamadas no observamos ningun paquete que lo utilizara, esto porque probablemente wireshark no reconocio el flujo de paquetes \textbf{UDP} como el correspondiente \textbf{RTP}. Ahora si, veamos el funcionamiento del \textbf{UDP}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{lab-02-screenshots/8.6-DuranteLlamada.png}
+    \caption{Tráfico \textbf{UDP} correspondiente al flujo de voz (posible \textbf{RTP}) en una llamada \textbf{SIP}.}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{lab-02-screenshots/8.6-UDPDurante.png}
+    \caption{Detalle trafico protocolo \textbf{udp}.}
+\end{figure}
+A continuacion vemos el detalle de este paquete.
+\begin{itemize}
+    \item \textbf{Ethernet II}: comunicación entre las direcciones MAC \texttt{e4:0d:36:44:dc:02} (origen) y \texttt{b6:11:c3:79:96:97} (destino).
+    \item \textbf{IPv4}: paquete enviado desde \texttt{172.20.10.9} hacia \texttt{172.20.10.5}.
+    \item \textbf{UDP}: segmento con puerto de origen \texttt{10378} y puerto de destino \texttt{53720}, longitud de \texttt{180} bytes.
+    \item \textbf{Carga útil (172 bytes)}: corresponde al flujo de audio, probablemente un paquete \texttt{RTP} con datos de voz codificados.
+\end{itemize}
+\subsection*{Conclusiones generales}
+\begin{itemize}
+\item \textbf{Información de la capa de aplicación:} Para el registro y la gestión de la sesión, se utiliza el protocolo \textbf{SIP} (Session Initiation Protocol), que opera en la capa de aplicación. Este protocolo emplea métodos como \texttt{REGISTER} para autenticar a los clientes y establecer la conexión, y utiliza códigos de estado (similares a HTTP) para indicar el éxito o fracaso de las peticiones.
+\item \textbf{Protocolo de la capa de transporte:} Durante el proceso de registro y la transmisión de datos de voz, el protocolo de la capa de transporte utilizado es \textbf{UDP} (User Datagram Protocol). UDP se elige por ser un protocolo sin conexión que prioriza la velocidad sobre la fiabilidad, lo que es ideal para aplicaciones de tiempo real como la voz sobre IP (VoIP), donde una pequeña pérdida de paquetes es preferible a una latencia alta. Además, se menciona que el protocolo \textbf{RTP} (Real-time Transport Protocol), que también utiliza UDP, es el que se encarga de transportar la información de audio durante la llamada.
+\item \textbf{Puertos utilizados:} Se identifican los siguientes puertos: el puerto estándar \textbf{5060} se utiliza para la señalización y el registro de clientes a través de SIP, mientras que para el flujo de voz durante la llamada, se utilizan puertos dinámicos. En el ejemplo, el puerto de origen es \textbf{10378} y el de destino es \textbf{53720}.
+\end{itemize}
 %==============================================================
 %=====================   8.7   ================================
 %==============================================================
@@ -565,10 +651,130 @@ En las capturas se aprecian campos como puertos origen/destino, números de secu
 \section{Análisis del protocolo RTMP}
 \subsection{Inicio de la transmisión}
 
+Al iniciar la transmision se hace uso del protocolo \textbf{TCP} para establecer conexion entre el servidor y el cliente, esto se hace a traves del uso de las flags (\textit{SYN, ACK} y que de esta manera se establezca el three way handshake y poder proceder con el inicio del protocolo \textbf{RTMP} asi como se puede ver en las siguientes imagenes:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{lab-02-screenshots/8.7-inicioTransmicion.png}
+    \caption{Conexion entre el cliente y el servidor usando TCP.}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{lab-02-screenshots/8.7-detalleTCP.png}
+    \caption{Detalle trafico protocolo \textbf{TCP}.}
+\end{figure}
+
+\begin{itemize}
+    \item \textbf{Tipo de Paquete:} Es un segmento TCP (Transmission Control Protocol).
+    \item \textbf{Inicio de Conexión:} El flag \texttt{SYN} (Synchronize) está activado (marcado como \texttt{0x002}). Esto indica que el cliente está solicitando iniciar una nueva conexión con el servidor.
+    \item \textbf{Origen y Destino:} La comunicación se origina desde la dirección IP \texttt{172.28.10.7} en el puerto \texttt{1255} y se dirige a la IP \texttt{172.28.10.11} en el puerto \texttt{1955}.
+    \item \textbf{Número de Secuencia:} El número de secuencia inicial es 0, lo cual es típico al comenzar una conexión.
+\end{itemize}
+En este paquete encontramos la siguiente informacion:
+\begin{itemize}
+    \item \textbf{Puerto origen:} 2255
+    \item \textbf{Puerto destino:} 1935
+    \item \textbf{Número de secuencia:} 0 (relativo)
+    \item \textbf{Número de acuse:} 0
+    \item \textbf{Ventana:} 65535
+    \item \textbf{Longitud de cabecera:} 32 bytes
+    \item \textbf{Opciones:} MSS, NOP, Window Scale, NOP, NOP
+\end{itemize}
+
+\subsection{Conexion Streaming}
+
+Seguido a esto, se inicia la conexión usando el protocolo \textbf{RTMP} (\textit{Real-Time Messaging Protocol}), el cual funciona sobre TCP y está diseñado 
+para la transmisión en tiempo real de audio, video y datos a través de internet.  Su función principal es mantener una comunicación estable y de baja latencia entre un cliente y un servidor de medios, permitiendo la transmisión continua (\textit{streaming}) de contenidos multimedia. RTMP fragmenta los datos en mensajes y los envía de manera ordenada, garantizando sincronización y fluidez en la reproducción. A continuacion veremos como funciona segun lo capturado en wireshark:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{lab-02-screenshots/8.7-rtmp1.png}
+    \caption{Detalle protocolo rtmp inicio.}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{lab-02-screenshots/8.7-rtmp2.png}
+    \caption{Detalle protocolo rtmp durante la transmision.}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{lab-02-screenshots/8.7-rtmp3.png}
+    \caption{Detalle protocolo rtmp durante la transmision.}
+\end{figure}
+
+\begin{itemize}
+    \item \textbf{Handshake C0+C1:} El cliente envía la versión del protocolo (03) 
+    junto con datos de inicialización (timestamp y datos aleatorios).
+    \item \textbf{Handshake S0+S1+S2:} El servidor responde confirmando la versión, 
+    enviando sus propios datos de inicialización y devolviendo los del cliente.
+    \item \textbf{Handshake C2:} El cliente confirma la recepción de los datos del servidor, 
+    completando así el proceso de sincronización.
+    \item \textbf{RTMP Command (AMF0 \_result):} Una vez finalizado el \textit{handshake}, 
+    se intercambian comandos de control en formato AMF0, como la respuesta \_result, 
+    que confirma la correcta conexión y preparación del canal para transmitir audio, 
+    video y datos en tiempo real.
+\end{itemize}
+Ahora bien, veamos como va funcionando el flujo de los paquetes durante la transmision:
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{lab-02-screenshots/8.7-conexionGeneral.png}
+    \caption{Detalle protocolo rtmp durante la transmision.}
+\end{figure}
+
+Tras completar el \textbf{handshake} inicial de RTMP, se observa el intercambio de mensajes de configuración entre el cliente (172.20.10.7) y el servidor (172.20.10.11), junto con retransmisiones y confirmaciones de control en la capa TCP.  
+
+\begin{itemize}
+    \item El cliente envía el \textbf{Handshake C0+C1} y el servidor responde con 
+    \textbf{S0+S1+S2}, completando la fase de sincronización.
+    \item Se observan varias retransmisiones TCP y \textbf{ACK duplicados}, lo que indica 
+    pérdida o retraso de paquetes en la comunicación.
+    \item El servidor envía el mensaje \textbf{Window Acknowledgement Size} (5000000), 
+    que define el tamaño máximo de ventana para el control de flujo.
+    \item Posteriormente, el servidor transmite los comandos 
+    \textbf{Set Peer Bandwidth (5000000, Dynamic)} y 
+    \textbf{Set Chunk Size (4096)}, que establecen los parámetros de transmisión.
+    \item Finalmente, se observa el comando \textbf{\_result('NetConnection.Connect.Success')}, 
+    que confirma la conexión exitosa del cliente al servidor RTMP y marca el inicio 
+    de la sesión de transmisión de audio, video y datos.
+\end{itemize}
+
+Por ultimo, veamos como el protocolo \textbf{RTMP} utiliza el protocolo de la capa de transporte \textbf{RTMP} para mantener una conexion estable y confiable con el servidor:
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{lab-02-screenshots/8.7-rtmpTCP.png}
+    \caption{Detalle protocolo RTMP usando el TCP.}
+\end{figure}
+\begin{itemize}
+    \item El paquete utiliza la bandera \textbf{PSH, ACK}, indicando que 
+    los datos deben ser entregados de inmediato a la capa superior.
+    \item El payload contiene un mensaje \textbf{Window Acknowledgement Size}, 
+    cuyo valor es \textbf{5,000,000 bytes}.
+    \item Este parámetro establece el límite máximo de datos que pueden ser 
+    enviados antes de requerir una confirmación, permitiendo al servidor 
+    regular el flujo de transmisión hacia el cliente.
+    \item Forma parte de la negociación de parámetros después del 
+    \textbf{handshake RTMP}, y es esencial para el control de congestión 
+    y el rendimiento de la sesión de streaming.
+\end{itemize}
 
 
+\subsection*{Conclusion final}
 
-
+\begin{itemize}
+    \item \textbf{Información de la capa de aplicación:} Se identificó el uso del protocolo 
+    \textbf{RTMP (Real-Time Messaging Protocol)}, encargado de la transmisión en tiempo real 
+    de audio, video y datos, soportado en mensajes como \textit{Handshake}, 
+    \textit{Window Acknowledgement Size}, \textit{Set Peer Bandwidth} y 
+    \textit{NetConnection.Connect.Success}.
+    
+    \item \textbf{Protocolo de la capa de transporte:} La transmisión hace uso de 
+    \textbf{TCP}, que garantiza una comunicación confiable mediante el 
+    \textit{three-way handshake} (SYN, SYN-ACK, ACK), retransmisiones y confirmaciones.
+    
+    \item \textbf{Puertos utilizados:} El servidor emplea el puerto estándar 
+    \textbf{1935} para RTMP, mientras que el cliente se conecta desde un puerto dinámico, 
+    identificado en la captura como el \textbf{2255}.
+\end{itemize}
 
 
 
