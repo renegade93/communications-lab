@@ -1,26 +1,26 @@
 \babel@toc {english}{}\relax 
 \contentsline {section}{Introducción}{3}{section*.1}%
 \contentsline {section}{\numberline {8.1}Prueba ping}{3}{section.1}%
-\contentsline {subsection}{\numberline {8.1.1}Prueba de conectividad al servidor DNS}{4}{subsection.1.1}%
+\contentsline {subsection}{\numberline {8.1.1}Prueba de conectividad al servidor DNS}{3}{subsection.1.1}%
 \contentsline {subsection}{\numberline {8.1.2}Prueba de conectividad al servidor FTP}{4}{subsection.1.2}%
-\contentsline {section}{\numberline {8.2}Análisis de tráfico del Servicio DNS}{4}{section.2}%
-\contentsline {subsection}{\numberline {8.2.1}Prueba de conectividad al Servidor Web (IP)}{4}{subsection.2.1}%
-\contentsline {subsection}{\numberline {8.2.2}Prueba de conectividad al Servidor Web (URL)}{4}{subsection.2.2}%
-\contentsline {section}{\numberline {8.3}Análisis de tráfico del Servicio FTP}{4}{section.3}%
-\contentsline {subsection}{\numberline {8.3.1}Conexión al servidor FTP}{4}{subsection.3.1}%
-\contentsline {subsection}{\numberline {8.3.2}Descarga de archivo (Download)}{4}{subsection.3.2}%
-\contentsline {subsection}{\numberline {8.3.3}Carga de archivo (Upload)}{4}{subsection.3.3}%
-\contentsline {section}{\numberline {8.4}Análisis de tráfico del Servicio Web}{4}{section.4}%
-\contentsline {subsection}{\numberline {8.4.1}Acceso al servidor web mediante HTTP}{4}{subsection.4.1}%
-\contentsline {section}{\numberline {8.5}Análisis del protocolo HTTPS realizando navegación en el sitio de YouTube}{4}{section.5}%
-\contentsline {subsection}{\numberline {8.5.1}Navegación en YouTube}{4}{subsection.5.1}%
-\contentsline {subsection}{\numberline {8.5.2}Navegación en otros sitios HTTPS}{4}{subsection.5.2}%
-\contentsline {subsubsection}{\numberline {8.5.2.1}https://www.elespectador.com}{4}{subsubsection.5.2.1}%
-\contentsline {subsubsection}{\numberline {8.5.2.2}https://www.eltiempo.com}{4}{subsubsection.5.2.2}%
-\contentsline {subsubsection}{\numberline {8.5.2.3}https://www.uniandes.edu.co}{4}{subsubsection.5.2.3}%
-\contentsline {subsubsection}{\numberline {8.5.2.4}https://www.bancolombia.com}{4}{subsubsection.5.2.4}%
-\contentsline {section}{\numberline {8.6}Análisis del protocolo VoIP}{4}{section.6}%
-\contentsline {subsection}{\numberline {8.6.1}Establecimiento de la llamada}{4}{subsection.6.1}%
-\contentsline {section}{\numberline {8.7}Análisis del protocolo RTMP}{4}{section.7}%
-\contentsline {subsection}{\numberline {8.7.1}Inicio de la transmisión}{4}{subsection.7.1}%
-\contentsline {section}{\numberline {9.1}Topología}{4}{section.1}%
+\contentsline {section}{\numberline {8.2}Análisis de tráfico del Servicio DNS}{5}{section.2}%
+\contentsline {subsection}{\numberline {8.2.1}Prueba de conectividad al Servidor Web (IP)}{5}{subsection.2.1}%
+\contentsline {subsection}{\numberline {8.2.2}Prueba de conectividad al Servidor Web (URL)}{6}{subsection.2.2}%
+\contentsline {section}{\numberline {8.3}Análisis de tráfico del Servicio FTP}{6}{section.3}%
+\contentsline {subsection}{\numberline {8.3.1}Conexión al servidor FTP}{6}{subsection.3.1}%
+\contentsline {subsection}{\numberline {8.3.2}Descarga de archivo (Download)}{7}{subsection.3.2}%
+\contentsline {subsection}{\numberline {8.3.3}Carga de archivo (Upload)}{7}{subsection.3.3}%
+\contentsline {section}{\numberline {8.4}Análisis de tráfico del Servicio Web}{8}{section.4}%
+\contentsline {subsection}{\numberline {8.4.1}Acceso al servidor web mediante HTTP}{8}{subsection.4.1}%
+\contentsline {section}{\numberline {8.5}Análisis del protocolo HTTPS realizando navegación en el sitio de YouTube}{8}{section.5}%
+\contentsline {subsection}{\numberline {8.5.1}Navegación en YouTube}{8}{subsection.5.1}%
+\contentsline {subsection}{\numberline {8.5.2}Navegación en otros sitios HTTPS}{8}{subsection.5.2}%
+\contentsline {subsubsection}{\numberline {8.5.2.1}https://www.elespectador.com}{8}{subsubsection.5.2.1}%
+\contentsline {subsubsection}{\numberline {8.5.2.2}https://www.eltiempo.com}{8}{subsubsection.5.2.2}%
+\contentsline {subsubsection}{\numberline {8.5.2.3}https://www.uniandes.edu.co}{8}{subsubsection.5.2.3}%
+\contentsline {subsubsection}{\numberline {8.5.2.4}https://www.bancolombia.com}{8}{subsubsection.5.2.4}%
+\contentsline {section}{\numberline {8.6}Análisis del protocolo VoIP}{8}{section.6}%
+\contentsline {subsection}{\numberline {8.6.1}Establecimiento de la llamada}{8}{subsection.6.1}%
+\contentsline {section}{\numberline {8.7}Análisis del protocolo RTMP}{8}{section.7}%
+\contentsline {subsection}{\numberline {8.7.1}Inicio de la transmisión}{8}{subsection.7.1}%
+\contentsline {section}{\numberline {9.1}Topología}{8}{section.1}%
