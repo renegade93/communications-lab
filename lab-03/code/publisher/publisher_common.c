@@ -89,7 +89,7 @@ static void apply_card(TeamState* T,int idx,int minute,char* out,size_t outsz,co
     int direct_red = (rand_in(1,100) <= 20);
     if(direct_red){
         T->sent_off[idx]=1; T->on_field[idx]=0;
-        snprintf(out,outsz,"%s|[RED] Direct red card for %s at %d'\n", topic, T->name[idx], minute);
+        snprintf(out,outsz,"%s|[RED] Direct red card for %s at %d (Player expelled)'\n", topic, T->name[idx], minute);
         return;
     }
     if(T->yellows[idx]==0){
@@ -97,7 +97,7 @@ static void apply_card(TeamState* T,int idx,int minute,char* out,size_t outsz,co
         snprintf(out,outsz,"%s|[CARD] Yellow card for %s at %d'\n", topic, T->name[idx], minute);
     }else{
         T->sent_off[idx]=1; T->on_field[idx]=0;
-        snprintf(out,outsz,"%s|[RED] Second yellow for %s at %d'\n", topic, T->name[idx], minute);
+        snprintf(out,outsz,"%s|[RED] Second yellow for %s at %d' (Player expelled)\n", topic, T->name[idx], minute);
     }
 }
 
