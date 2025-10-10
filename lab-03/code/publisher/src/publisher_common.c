@@ -37,14 +37,12 @@ void parse_teams(const char* topic, char* A, char* B) {
 
 TeamRoster get_team(const char* name){
     TeamRoster r={0};
-    if(ieq(name,"Barcelona"))   { r.starters=BAR_ST; r.n_st=STARTERS; r.bench=BAR_BN; r.n_bn=BENCH; return r; }
-    if(ieq(name,"PSG"))         { r.starters=PSG_ST; r.n_st=STARTERS; r.bench=PSG_BN; r.n_bn=BENCH; return r; }
-    if(ieq(name,"Juventus"))    { r.starters=JUV_ST; r.n_st=STARTERS; r.bench=JUV_BN; r.n_bn=BENCH; return r; }
-    if(ieq(name,"RealMadrid")||ieq(name,"Real_Madrid")||ieq(name,"Real")) {
-        r.starters=RMA_ST; r.n_st=STARTERS; r.bench=RMA_BN; r.n_bn=BENCH; return r; }
-    if(ieq(name,"Bayern")||ieq(name,"BayernMunich")||ieq(name,"Bayern_Munich")) {
-        r.starters=BAY_ST; r.n_st=STARTERS; r.bench=BAY_BN; r.n_bn=BENCH; return r; }
-    if(ieq(name,"Liverpool"))   { r.starters=LIV_ST; r.n_st=STARTERS; r.bench=LIV_BN; r.n_bn=BENCH; return r; }
+    if(ieq(name,"Barcelona"))       { r.starters=BAR_ST; r.n_st=STARTERS; r.bench=BAR_BN; r.n_bn=BENCH; return r; }
+    if(ieq(name,"PSG"))             { r.starters=PSG_ST; r.n_st=STARTERS; r.bench=PSG_BN; r.n_bn=BENCH; return r; }
+    if(ieq(name,"Juventus"))        { r.starters=JUV_ST; r.n_st=STARTERS; r.bench=JUV_BN; r.n_bn=BENCH; return r; }
+    if(ieq(name,"RealMadrid"))      { r.starters=RMA_ST; r.n_st=STARTERS; r.bench=RMA_BN; r.n_bn=BENCH; return r; }
+    if(ieq(name,"BayernMunich"))    { r.starters=BAY_ST; r.n_st=STARTERS; r.bench=BAY_BN; r.n_bn=BENCH; return r; }
+    if(ieq(name,"Liverpool"))       { r.starters=LIV_ST; r.n_st=STARTERS; r.bench=LIV_BN; r.n_bn=BENCH; return r; }
     return r;
 }
 
@@ -89,7 +87,7 @@ static void apply_card(TeamState* T,int idx,int minute,char* out,size_t outsz,co
     int direct_red = (rand_in(1,100) <= 20);
     if(direct_red){
         T->sent_off[idx]=1; T->on_field[idx]=0;
-        snprintf(out,outsz,"%s|[RED] Direct red card for %s at %d'\n", topic, T->name[idx], minute);
+        snprintf(out,outsz,"%s|[RED] Direct red card for %s at %d (Player expelled)\n", topic, T->name[idx], minute);
         return;
     }
     if(T->yellows[idx]==0){
@@ -97,7 +95,7 @@ static void apply_card(TeamState* T,int idx,int minute,char* out,size_t outsz,co
         snprintf(out,outsz,"%s|[CARD] Yellow card for %s at %d'\n", topic, T->name[idx], minute);
     }else{
         T->sent_off[idx]=1; T->on_field[idx]=0;
-        snprintf(out,outsz,"%s|[RED] Second yellow for %s at %d'\n", topic, T->name[idx], minute);
+        snprintf(out,outsz,"%s|[RED] Second yellow for %s at %d' (Player expelled)\n", topic, T->name[idx], minute);
     }
 }
 
