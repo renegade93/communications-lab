@@ -33,16 +33,25 @@ int register_subscription_tcp(const char *topic, int fd) {
         strcpy(topics[idx].name, topic);
         topics[idx].num_subs_tcp = 0;
         topics[idx].num_subs_udp = 0;
+        printf("[Broker] Created new topic #%d: %s\n", idx, topic);
     }
 
-    // avoid duplicates
+    // Avoid duplicate subscription
     for (int i = 0; i < topics[idx].num_subs_tcp; i++)
         if (topics[idx].subs_tcp[i] == fd)
             return idx;
 
     topics[idx].subs_tcp[topics[idx].num_subs_tcp++] = fd;
-    printf("[Broker] Client %d subscribed to %s (%d TCP subs)\n",
-           fd, topic, topics[idx].num_subs_tcp);
+
+    int total = 0;
+    for (int i = 0; i < num_topics; i++)
+        for (int j = 0; j < topics[i].num_subs_tcp; j++)
+            if (topics[i].subs_tcp[j] == fd)
+                total++;
+
+    printf("[Broker-TCP] Client %d subscribed to '%s' (Topic #%d, %d total subs, now follows %d topics)\n",
+           fd, topic, idx, topics[idx].num_subs_tcp, total);
+
     return idx;
 }
 
@@ -58,17 +67,22 @@ int register_subscription_udp(const char *topic, struct sockaddr_in *addr) {
         strcpy(topics[idx].name, topic);
         topics[idx].num_subs_tcp = 0;
         topics[idx].num_subs_udp = 0;
+        printf("[Broker] Created new topic #%d: %s\n", idx, topic);
     }
 
-    // avoid duplicates
+    // Avoid duplicate subscription
     for (int i = 0; i < topics[idx].num_subs_udp; i++)
         if (same_addr(&topics[idx].subs_udp[i], addr))
             return idx;
 
     topics[idx].subs_udp[topics[idx].num_subs_udp++] = *addr;
-    printf("[Broker] UDP subscriber %s:%d subscribed to %s (%d UDP subs)\n",
-           inet_ntoa(addr->sin_addr), ntohs(addr->sin_port),
-           topic, topics[idx].num_subs_udp);
+
+    char ip[INET_ADDRSTRLEN];
+    inet_ntop(AF_INET, &(addr->sin_addr), ip, sizeof(ip));
+
+    printf("[Broker-UDP] Subscriber %s:%d subscribed to '%s' (Topic #%d, %d total subs)\n",
+           ip, ntohs(addr->sin_port), topic, idx, topics[idx].num_subs_udp);
+
     return idx;
 }
 
