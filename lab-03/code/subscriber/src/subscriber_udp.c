@@ -1,6 +1,6 @@
 // subscriber_udp.c
 // Subscribes to multiple topics and prints UDP messages from broker.
-// Usage: ./subscriber_udp <broker_ip> <broker_port> <local_port> <topic1> [topic2 ...]
+// Usage: ./subscriber_udp <broker_ip> <broker_port> <topic1> [topic2 ...]
 
 #include "subscriber_common.h"
 #include <stdio.h>
@@ -11,16 +11,16 @@
 #include <sys/socket.h>
 
 int main(int argc, char *argv[]) {
-    if (argc < 5) {
-        fprintf(stderr, "Usage: %s <broker_ip> <broker_port> <local_port> <topic1> [topic2 ...]\n", argv[0]);
+    if (argc < 4) {
+        fprintf(stderr, "Usage: %s <broker_ip> <broker_port> <topic1> [topic2 ...]\n", argv[0]);
         exit(EXIT_FAILURE);
     }
 
     const char *broker_ip = argv[1];
     int broker_port = atoi(argv[2]);
-    int local_port  = atoi(argv[3]);
 
-    int sock = setup_udp_socket(local_port);
+    // Let OS choose local port automatically
+    int sock = setup_udp_socket(0);
 
     struct sockaddr_in broker_addr;
     memset(&broker_addr, 0, sizeof(broker_addr));
@@ -32,7 +32,7 @@ int main(int argc, char *argv[]) {
     }
 
     // Subscribe to all given topics
-    for (int i = 4; i < argc; i++) {
+    for (int i = 3; i < argc; i++) {
         send_subscription_udp(sock, argv[i], &broker_addr);
     }
 
