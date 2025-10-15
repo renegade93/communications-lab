@@ -49,7 +49,7 @@ int register_subscription_tcp(const char *topic, int fd) {
             if (topics[i].subs_tcp[j] == fd)
                 total++;
 
-    printf("[Broker-TCP] Client %d subscribed to '%s' (Topic #%d, %d total subs, now follows %d topics)\n",
+    printf("[Broker-TCP] Client %d subscribed to '%s' (Topic #%d, %d total subs, Client now follows %d topics)\n",
            fd, topic, idx, topics[idx].num_subs_tcp, total);
 
     return idx;

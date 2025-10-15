@@ -48,7 +48,11 @@ int main(int argc, char *argv[]) {
             continue;
         }
         buffer[n] = '\0';
-        printf("%s", buffer);
+        if (buffer[n - 1] != '\n')
+            printf("%s\n", buffer);
+        else
+            printf("%s", buffer);
+
         fflush(stdout);
     }
 

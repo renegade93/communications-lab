@@ -1,6 +1,5 @@
 // broker_tcp.c
-// Receives messages from publishers and forwards them to TCP subscribers.
-// Usage: ./broker_tcp <port>
+// Handles multiple subscriptions per client (proper line-based parsing).
 
 #include "broker_common.h"
 #include <stdio.h>
@@ -8,13 +7,15 @@
 #include <string.h>
 #include <unistd.h>
 #include <errno.h>
+#include <arpa/inet.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <sys/select.h>
 
+#define MAX_CLIENTS 100
 #define BUFFER_SIZE 1024
 
-void remove_client(int fd, fd_set *master) {
+static void remove_client(int fd, fd_set *master) {
     for (int i = 0; i < num_topics; i++) {
         for (int j = 0; j < topics[i].num_subs_tcp; j++) {
             if (topics[i].subs_tcp[j] == fd) {
@@ -47,15 +48,17 @@ int main(int argc, char *argv[]) {
     int opt = 1;
     setsockopt(listener, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
 
+    memset(&server_addr, 0, sizeof(server_addr));
     server_addr.sin_family = AF_INET;
     server_addr.sin_addr.s_addr = INADDR_ANY;
     server_addr.sin_port = htons(port);
+
     if (bind(listener, (struct sockaddr*)&server_addr, sizeof(server_addr)) < 0) {
-        perror("bind");
-        exit(EXIT_FAILURE);
+        perror("bind"); exit(EXIT_FAILURE);
     }
 
     if (listen(listener, 10) < 0) { perror("listen"); exit(EXIT_FAILURE); }
+
     printf("[Broker-TCP] Listening on port %d...\n", port);
 
     FD_ZERO(&master);
@@ -73,36 +76,45 @@ int main(int argc, char *argv[]) {
             if (!FD_ISSET(fd, &read_fds)) continue;
 
             if (fd == listener) {
+                // New connection
                 addrlen = sizeof(client_addr);
                 newfd = accept(listener, (struct sockaddr*)&client_addr, &addrlen);
                 if (newfd == -1) { perror("accept"); continue; }
                 FD_SET(newfd, &master);
                 if (newfd > fdmax) fdmax = newfd;
                 printf("[Broker-TCP] New connection from %s:%d (fd=%d)\n",
-                       inet_ntoa(client_addr.sin_addr),
-                       ntohs(client_addr.sin_port), newfd);
+                       inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port), newfd);
             } else {
-                int nbytes = recv(fd, buf, sizeof(buf)-1, 0);
+                // Existing client sent data
+                int nbytes = recv(fd, buf, sizeof(buf) - 1, 0);
                 if (nbytes <= 0) {
                     if (nbytes == 0)
-                        printf("[Broker-TCP] Client %d closed connection\n", fd);
-                    else perror("recv");
+                        printf("[Broker-TCP] Client %d hung up\n", fd);
+                    else
+                        perror("recv");
                     remove_client(fd, &master);
-                } else {
-                    buf[nbytes] = '\0';
+                    continue;
+                }
 
-                    if (strncmp(buf, "SUBSCRIBE|", 10) == 0) {
-                        char *topic = buf + 10;
+                buf[nbytes] = '\0';
+
+                char *line = strtok(buf, "\n");
+                while (line != NULL) {
+                    if (strncmp(line, "SUBSCRIBE|", 10) == 0) {
+                        char *topic = line + 10;
                         topic[strcspn(topic, "\r\n")] = '\0';
                         register_subscription_tcp(topic, fd);
                     } else {
-                        char *sep = strchr(buf, '|');
-                        if (!sep) continue;
-                        char topic[MAX_TOPIC_LEN];
-                        strncpy(topic, buf, sep - buf);
-                        topic[sep - buf] = '\0';
-                        broker_forward_message_tcp(topic, buf);
+                        // Publisher message
+                        char *sep = strchr(line, '|');
+                        if (sep) {
+                            char topic[MAX_TOPIC_LEN];
+                            strncpy(topic, line, sep - line);
+                            topic[sep - line] = '\0';
+                            broker_forward_message_tcp(topic, line);
+                        }
                     }
+                    line = strtok(NULL, "\n");
                 }
             }
         }
