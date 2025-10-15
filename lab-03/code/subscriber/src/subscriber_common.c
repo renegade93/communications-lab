@@ -30,8 +30,8 @@ int connect_tcp(const char *ip, int port) {
     return sock;
 }
 
-// --- UDP setup ---
-int setup_udp_socket(int port) {
+// --- UDP setup (always random port) ---
+int setup_udp_socket(void) {
     int sock = socket(AF_INET, SOCK_DGRAM, 0);
     if (sock < 0) { perror("socket"); exit(EXIT_FAILURE); }
 
@@ -39,7 +39,9 @@ int setup_udp_socket(int port) {
     memset(&addr, 0, sizeof(addr));
     addr.sin_family = AF_INET;
     addr.sin_addr.s_addr = INADDR_ANY;
-    addr.sin_port = htons(port);
+
+    // random port
+    addr.sin_port = htons(0);  
 
     if (bind(sock, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
         perror("bind");
@@ -47,18 +49,15 @@ int setup_udp_socket(int port) {
         exit(EXIT_FAILURE);
     }
 
-    printf("[Subscriber-UDP] Listening on local port %d\n", port);
     return sock;
 }
 
 // --- Send SUBSCRIBE (TCP) ---
 void send_subscription_tcp(int sock, const char *topic) {
-    // Build and send the subscription message
     char msg[MAX_TOPIC_LEN + 20];
     snprintf(msg, sizeof(msg), "SUBSCRIBE|%s\n", topic);
     send(sock, msg, strlen(msg), 0);
 
-    // Retrieve local address info for display
     struct sockaddr_in local_addr;
     socklen_t len = sizeof(local_addr);
     getsockname(sock, (struct sockaddr*)&local_addr, &len);
@@ -69,18 +68,16 @@ void send_subscription_tcp(int sock, const char *topic) {
 
 // --- Send SUBSCRIBE (UDP) ---
 void send_subscription_udp(int sock, const char *topic,
-    struct sockaddr_in *broker_addr) {
-    // Build and send the subscription message
+                           struct sockaddr_in *broker_addr) {
     char msg[MAX_TOPIC_LEN + 20];
     snprintf(msg, sizeof(msg), "SUBSCRIBE|%s\n", topic);
     sendto(sock, msg, strlen(msg), 0,
-    (struct sockaddr*)broker_addr, sizeof(*broker_addr));
+           (struct sockaddr*)broker_addr, sizeof(*broker_addr));
 
-    // Retrieve and show the subscriber's local port
     struct sockaddr_in local_addr;
     socklen_t len = sizeof(local_addr);
     getsockname(sock, (struct sockaddr*)&local_addr, &len);
 
     printf("[Subscriber-UDP] Subscribed to topic: %-25s | Local port: %d\n",
-    topic, ntohs(local_addr.sin_port));
+           topic, ntohs(local_addr.sin_port));
 }

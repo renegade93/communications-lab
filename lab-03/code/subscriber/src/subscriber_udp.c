@@ -19,8 +19,7 @@ int main(int argc, char *argv[]) {
     const char *broker_ip = argv[1];
     int broker_port = atoi(argv[2]);
 
-    // Let OS choose local port automatically
-    int sock = setup_udp_socket(0);
+    int sock = setup_udp_socket();  
 
     struct sockaddr_in broker_addr;
     memset(&broker_addr, 0, sizeof(broker_addr));
@@ -31,7 +30,7 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
     }
 
-    // Subscribe to all given topics
+    // Subscribe to all topics provided
     for (int i = 3; i < argc; i++) {
         send_subscription_udp(sock, argv[i], &broker_addr);
     }
@@ -47,7 +46,9 @@ int main(int argc, char *argv[]) {
             perror("recvfrom");
             continue;
         }
+
         buffer[n] = '\0';
+        // Ensure clean output
         if (buffer[n - 1] != '\n')
             printf("%s\n", buffer);
         else
