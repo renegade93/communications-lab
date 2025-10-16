@@ -22,6 +22,20 @@
 \usepackage{tcolorbox}
 \tcbuselibrary{listings}
 
+
+% code
+\usepackage{listings}
+\usepackage{xcolor}
+
+\lstset{
+  basicstyle=\ttfamily\small,
+  backgroundcolor=\color{gray!10},
+  frame=single,
+  breaklines=true,
+  columns=fullflexible,
+  showstringspaces=false
+}
+
 \newtcblisting{cc}{
   listing only,
   nobeforeafter,
@@ -148,7 +162,7 @@
 \includegraphics[width=100pt]{images/logo.png} 
 
 \vspace{35pt}
-{\LARGE \bfseries Laboratorio \#2: Análisis De Protocolos De La Capa De Aplicación}
+{\LARGE \bfseries Laboratorio \#3: Análisis De Capa de Transporte y Sockets}
 \vspace{55pt}
 
 {\Large \bfseries ISIS3204 - Infraestructura de Comunicaciones}
@@ -187,597 +201,560 @@
 \renewcommand{\thesection}{\arabic{section}}
 \section*{Introducción}
 \addcontentsline{toc}{section}{Introducción}
-En este laboratorio configuramos y probamos algunos servicios de red: DNS, HTTP/HTTPS, FTP, VoIP y RTMP, usando una topología a pequeña escala. Con Wireshark analizamos la conectividad de estos servicios en dicha red. Este laboratorio nos ayudó a entender la interacción de protocolos importantes que soportan la comunicación en redes de computadores. En la figura 1 mostramos las IPs estáticas que usamos para este laboratorio. (Es importante que estas IPs no sean dinamicas por DHCP ya que esto asegura direccionamiento constante y facilidad de configuración stable en la red.) La asignación de direcciones inició en $172.20.10.5$ porque el gateway de la red es el hotspot del iPhone en $172.20.10.1$, dejando libres las direcciones previas para posibles equipos de infraestructura y evitando conflictos.
+En este laboratorio implementamos un sistema de mensajería usando el modelo publicador–suscriptor con sockets TCP y UDP para simular la transmisión en tiempo real de eventos en partidos de la UEFA Champions League.  Los publicadores actúan como periodistas que envían actualizaciones en vivo de los partidos, el broker gestiona la distribución de los mensajes por partido, y los suscriptores reciben las notificaciones relevantes a las que estan suscritos. El sistema demuestra la comunicación asíncrona, la escalabilidad y los compromisos entre confiabilidad y rendimiento de los protocolos de transporte TCP y UDP en aplicaciones basadas en sockets.
 
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.55\textwidth]{lab-02-screenshots/server-ips.png}
-    \caption{Configuración de IPs estáticas}
-\end{figure}
-
-
-%==============================================================
-%=====================   8.1   ================================
-%==============================================================
-\renewcommand{\thesection}{8.\arabic{section}}
-\setcounter{section}{0}
-\section{Prueba ping}
-
-En esta sección se verifica la conexión básica entre el cliente y los servidores DNS y FTP mediante pings con el protocolo ICMP, asegurando la conectividad antes de analizar los demás protocolos.
-
-\subsection{Prueba de conectividad al servidor DNS}
-
-Desde el cliente se enviaron pings (echo requests ICMP ) al servidor DNS utilizando su dirección IP (\textbf{172.20.10.8}). El tráfico generado se capturó y se guardó en el archivo \textcolor{blue}{\texttt{Ping\_DNS\_IP.pcap}}. El archivo fue abierto en Wireshark y se aplicó el filtro icmp para observar únicamente los paquetes de ping. Se registraron la dirección IP de origen, dirección IP de destino, dirección MAC de origen y dirección MAC de destino en las tramas capturadas.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.85\textwidth]{lab-02-screenshots/8.1-DNS-flow}
-    \caption{Flujo de packets en DNS ping}
-\end{figure}
-
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.85\textwidth]{lab-02-screenshots/8.1-DNS-data}
-    \caption{Evidencia de IPs y MACs origen/destino}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.85\textwidth]{lab-02-screenshots/8.1-DNS-ping-table}
-    \caption{Tabla de IPs y MACs origen/destino}
-\end{figure}
-
-
-\subsection{Prueba de conectividad al servidor FTP}
-
-Desde el cliente se enviaron pings al servidor FTP utilizando su dirección IP. El tráfico generado se capturó y se guardó en el archivo \textcolor{blue}{\texttt{Ping\_FTP\_IP.pcap}} El archivo fue analizado en Wireshark con el filtro icmp. Se identificaron las direcciones IP y MAC correspondientes a los paquetes de solicitud y respuesta.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.85\textwidth]{lab-02-screenshots/8.1-FTP-flow}
-    \caption{Flujo de packets en FTP ping}
-\end{figure}
-
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.85\textwidth]{lab-02-screenshots/8.1-FTP-data}
-    \caption{Evidencia de IPs y MACs origen/destino}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.85\textwidth]{lab-02-screenshots/8.1-FTP-ping-table}
-    \caption{Tabla de IPs y MACs origen/destino}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.85\textwidth]{lab-02-screenshots/8.1-disclaimer}
-\end{figure}
-
-%==============================================================
-%=====================   8.2   ================================
-%==============================================================
-\renewcommand{\thesection}{8.\arabic{section}}
-\section{Análisis de tráfico del Servicio DNS}
-
-En esta sección se analiza el servicio DNS, que traduce nombres de dominio en direcciones IP para facilitar la comunicación en la red. Se genera y captura tráfico con Wireshark, identificando consultas y respuestas, así como el protocolo de transporte y los puertos utilizados al acceder a un servidor web por IP y por nombre de dominio.
-
-
-Cuando un cliente necesita comunicarse con un dominio, primero envía al servidor DNS una consulta de tipo \textit{A} para obtener su dirección IPv4 y, en paralelo, una consulta de tipo \textit{AAAA} para la dirección IPv6. El servidor responde con los registros correspondientes, que el cliente almacena en caché. Con la IP resuelta, el cliente ya puede establecer la comunicación (ej. enviar un ping) directamente al servidor destino.  
-
-\subsection{Prueba de conectividad al Servidor Web (IP)}
-Cuando se accedió al servidor escribiendo directamente su dirección IP en el ping request, la conexión se estableció de inmediato ya que no fue necesario consultar al DNS y en la captura se observó únicamente tráfico ICMP entre cliente y servidor. El tráfico generado se capturó y se guardó en el archivo \textcolor{blue}{\texttt{Ping\_WEB\_IP.pcap}} El archivo fue analizado en Wireshark con el filtro icmp.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.85\textwidth]{lab-02-screenshots/8.2-WEB-IP-flow}
-    \caption{Flujo de packets en WEB IP ping}
-\end{figure}
-
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.85\textwidth]{lab-02-screenshots/8.2-WEB-IP-data}
-    \caption{Evidencia de IPs, MACs, y puertos origen/destino}
-\end{figure}
-
-\textbf{En esta prueba, no hay resolución DNS.}
-
-\subsection{Prueba de conectividad al Servidor Web (URL)}
-Cuando se accedió al servidor utilizando su nombre de dominio en la solicitud de ping, el cliente primero realizó consultas de tipo A y AAAA al servidor DNS para obtener la dirección IP correspondiente. Una vez resuelta, se estableció la comunicación con el servidor y en la captura se observó inicialmente el tráfico DNS seguido por el intercambio ICMP entre cliente y servidor. El tráfico generado se capturó y se guardó en el archivo \textcolor{blue}{\texttt{Ping\_WEB.pcap}}, el cual fue analizado en Wireshark aplicando filtros para DNS e ICMP.
-
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.85\textwidth]{lab-02-screenshots/8.2-WEB-flow}
-    \caption{Flujo de packets en WEB Domain ping}
-\end{figure}
-
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.85\textwidth]{lab-02-screenshots/8.2-WEB-data}
-    \caption{Evidencia de IPs, MACs, y puertos origen/destino}
-\end{figure}
-
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.85\textwidth]{lab-02-screenshots/8.2-WEB-IP-table}
-    \caption{Tabla de IPs, MACs, y puertos origen/destino}
-\end{figure}
-
-%==============================================================
-%=====================   8.3   ================================
-%==============================================================
-\renewcommand{\thesection}{8.\arabic{section}}
-\section{Análisis de tráfico del Servicio FTP}
-
-En esta sección se verifica el correcto funcionamiento del servicio FTP realizando una sesión autenticada desde el cliente para descargar y subir un archivo, capturando cada fase en los archivos \textcolor{blue}{\texttt{FTP\_download.pcap}} y \textcolor{blue}{\texttt{FTP\_upload.pcap}}. Usando Wireshark, se filtra el tráfico FTP para examinar los intercambios de control y de datos, y posteriormente se documentan los detalles de la capa de aplicación, el protocolo de transporte utilizado, y los puertos involucrados. 
-
-\subsection{Conexión al servidor FTP}
-El servidor responde primero con el mensaje de bienvenida. El cliente intenta establecer una sesión segura con AUTH TLS/SSL, pero el servidor lo rechaza con código \textcolor{red}{530} y solicita autenticación clásica (Esto se debe a que inicialmente configuré el servidor sde forma segura con vsfptd pero deshabilité la seguridad para poder observar bien el protocolo FTP). Luego el cliente envía \textcolor{red}{USER hermione} y \textcolor{red}{PASS test123}, a lo que el servidor responde con \textcolor{red}{230 Login successful}, confirmando el acceso. Luego, se ejecutan otros comandos donde el servido lista sus funcionalidades soportadas \textcolor{red}{(PASV, EPSV, MDTM, etc.)}. Todo este intercambio ocurre sobre TCP puerto 21 en el canal de control.
-
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.85\textwidth]{lab-02-screenshots/8.3-FTP-start-session}
-    \caption{Inicio de sesión FTP}
-\end{figure}
-
-\subsection{Descarga de archivo (Download)}
-En esta parte se observa la navegación y transferencia de un archivo en FTP. Tras el mensaje \textcolor{red}{230 Login successful}, el cliente cambia al directorio \textcolor{red}{/files} con CWD y el servidor confirma con \textcolor{red}{250}. Luego el cliente consulta el directorio actua y solicita modo pasivo con 8.3-FTP-download-flow{PASV}. El servidor responde con la dirección y puerto a usar \textcolor{red}{(227 Entering Passive Mode)}. El cliente pide descargar el archivo \textcolor{red}{a.txt} con \textcolor{red}{RETR a.txt}, el servidor abre la conexión de datos \textcolor{red}{(150 Opening data connection)} y confirma la transferencia exitosa de este archivo con \textcolor{red}{226 Transfer complete.}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.85\textwidth]{lab-02-screenshots/8.3-FTP-download-flow}
-    \caption{Descarga de archivo por usuario "hermione"}
-\end{figure}
-
-\subsection{Carga de archivo (Upload)}
-Después del inicio de sesión exitoso \textcolor{red}{(230 Login successful)}, el cliente cambia al directorio \textcolor{red}{/files} con \textcolor{red}{CWD /files}, confirmado por el servidor con \textcolor{red}{250 Directory successfully changed}. Luego verifica la ubicación con \textcolor{red}{PWD}, y el servidor responde con \textcolor{red}{257 "/files"}. El cliente ajusta el modo de transferencia a ASCII con TYPE A, y el servidor responde \textcolor{red}{200 Switching to ASCII mode}. Con el comando \textcolor{red}{PASV} se abre un canal de datos en modo pasivo, indicado por la respuesta \textcolor{red}{227 Entering Passive Mode}. Al final del proceso, el cliente solicita hacer upload del archivo \textcolor{red}{b.txt} con \textcolor{red}{STOR b.txt} y el servidor responde \textcolor{red}{150 Ok to send data} y, al finalizar la transferencia, confirma con \textcolor{red}{226 Transfer complete}.
-
-En estas capturas no mostramos el hecho de que tenemos dos usuarios: "harry" y "hermione". Los archivos de "hermione" no son visibles desde POV del usuario de "harry"y vice versa. (Esto lo configuramos en \textcolor{blue}{/etc/vsftpd.conf})
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.85\textwidth]{lab-02-screenshots/8.3-FTP-upload-flow}
-    \caption{Descarga de archivo por usuario "hermione"}
-\end{figure}
-%==============================================================
-%=====================   8.4   ================================
-%==============================================================
-\renewcommand{\thesection}{8.\arabic{section}}
-\section{Análisis de tráfico del Servicio Web}
-En esta sección se analiza el funcionamiento del protocolo HTTP dentro de la topología configurada. Mediante capturas en Wireshark, se observan las peticiones y respuestas entre el cliente y el servidor web en texto claro, lo que permite identificar directamente los encabezados y contenidos intercambiados, así como los puertos y el protocolo de transporte utilizados en la comunicación. El tráfico generado se capturó y se guardó en el archivo \textcolor{blue}{\texttt{Ping\_WEB\_view.pcap}}
-\subsection{Acceso al servidor web mediante HTTP}
-En esta captura se observa primero la resolución DNS de \textcolor{blue}{web.labredes31.com}. A continuación, el cliente establece una conexión TCP con el servidor en el puerto 80, completando el three-way handshake. Luego, el cliente envía una petición \textcolor{red}{GET / HTTP/1.1} y el servidor responde con \textcolor{red}{HTTP/1.1 200 OK}, entregando la página en plaintext. Luego el cliente solicita el recurso \textcolor{red}{/favicon.ico}, que también recibe una respuesta satisfactoria \textcolor{red}{200 OK}. Finalmente, la comunicación se cierra correctamente mediante el intercambio de mensajes \textcolor{red}{FIN, ACK}, completando así el ciclo típico de una sesión HTTP.
-
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.85\textwidth]{lab-02-screenshots/8.4-HTTP-flow}
-    \caption{Flow de HTTP}
-\end{figure}
-
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.85\textwidth]{lab-02-screenshots/8.4-web-browser}
-    \caption{Vista de página web desde buscador en Ubuntu Client}
-\end{figure}
-
-
-%==============================================================
-%=====================   8.5   ================================
-%==============================================================
-\renewcommand{\thesection}{8.\arabic{section}}
-\section{Análisis del protocolo HTTPS realizando navegación en el sitio de YouTube}
-
-\subsection{Navegación en YouTube}
-Se realizó la captura de tráfico mientras se navegaba en \textbf{https://www.youtube.com/}. 
-Para reducir interferencias, se mantuvo una única pestaña activa en el navegador; se inició sesión con cuenta de Google y se realizaron acciones de navegación/comentarios. 
-La captura se guardó como \texttt{YouTube\_view.pcapng}.
-
+\subsection*{Escenario de prueba}
+Nostros creamos un sistema que permite generar simulaciones de partidos entre los siguientes equipos:
 \begin{itemize}
-    \item \textbf{Filtro aplicado en Wireshark:} \texttt{tcp.port == 443}.
-    \item \textbf{Capa de aplicación (TLS):} Se observan mensajes del \textit{handshake TLS} (\textit{Client Hello}, \textit{Server Hello}, \textit{Certificate}) y posteriormente \textit{Application Data}, que corresponde a tráfico HTTP cifrado.
-    \item \textbf{Capa de transporte (TCP):} HTTPS se ejecuta sobre TCP, lo que provee fiabilidad mediante control de flujo, numeración de secuencia y \textit{ACKs}.
-    \item \textbf{Puertos:} Destino \textbf{443} (HTTPS) y puertos de origen efímeros.
-    \item \textbf{SNI/servidores:} \texttt{youtube.com}, \texttt{accounts.youtube.com} y dominios relacionados.
+    \item Real Madrid CF
+    \item Juventus FC
+    \item Paris Saint-Germain FC
+    \item FC Barcelona
+    \item Liverpool FC
+    \item FC Bayern Munich
 \end{itemize}
 
-\noindent\textbf{Conclusión (YouTube):} 
-El tráfico está protegido mediante TLS (1.2/1.3). 
-El contenido de peticiones/respuestas HTTP no es visible (aparece como \textit{Application Data}), garantizando confidencialidad e integridad.
+Sin embargo, para las pruebas realizadas en Wireshark, montamos 3 partidos en particular:
+\texttt{RealMadrid\_vs\_Juventus}, \texttt{Liverpool\_vs\_BayernMunich}, y \texttt{Barcelona\_vs\_PSG} en los cuales hay un publicador por partido transmitiendo al broker. Por otro lado tenemos 4 suscriptores:
 
-%--------------------------------------------------------------
-\subsection{Navegación en otros sitios HTTPS}
-Se realizó una segunda captura visitando: \textbf{www.elespectador.com}, \textbf{www.eltiempo.com}, \textbf{www.uniandes.edu.co} y \textbf{www.bancolombia.com} (\texttt{HTTPS\_view.pcapng}). 
-En todos los casos se evidenció \textbf{TLS} sobre \textbf{TCP/443}, con presencia de \textit{Client Hello}/\textit{Server Hello}/\textit{Application Data}.
+\begin{itemize}
+    \item Suscriptor \#1: \texttt{RealMadrid\_vs\_Juventus}, \texttt{Liverpool\_vs\_BayernMunich}, y \texttt{Barcelona\_vs\_PSG}
+     \item Suscriptor \#2: \texttt{RealMadrid\_vs\_Juventus}
+     \item Suscriptor \#3: \texttt{Liverpool\_vs\_BayernMunich}
+     \item Suscriptor \#4: \texttt{Barcelona\_vs\_PSG} y \texttt{Liverpool\_vs\_BayernMunich}    
+\end{itemize}
 
-\noindent\textbf{Conclusión (otros sitios):}
-Todos emplean HTTPS; se identificaron versiones TLS 1.2/1.3 según el host. 
-El cifrado impide visualizar el contenido HTTP en claro.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{screenshots/intro-1.png}
+    \caption{Configuración de escenario de prueba}
+\end{figure}
+
+
 
 %==============================================================
-%=====================   Flujos   =============================
+%=======================   1   ================================
 %==============================================================
-\subsection*{Representación gráfica de flujos}
+\section{Modelo Publicador–Suscriptor}
+
+\subsection{Configuración}
+Nuestro proyecto tiene la siguiente configuración que fue diseñada para poder reutilizar codigo compartido entre los archivos TCP y UDP.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.95\textwidth]{lab-02-screenshots/8.5-YouTube-flow.png}
-    \caption{Flujo de comunicación durante la navegación en YouTube. Se aprecian múltiples \texttt{Application Data} (tráfico cifrado) y \texttt{ACKs} propios de TCP hacia distintos hosts de Google/YouTube.}
+    \includegraphics[width=0.30\textwidth]{screenshots/intro-file-structure}
+    \caption{Estructura de proyecto}
 \end{figure}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.95\textwidth]{lab-02-screenshots/8.5-HTTPS-flow.png}
-    \caption{Flujo durante la navegación en sitios HTTPS (El Espectador, El Tiempo, Uniandes y Bancolombia). Se observa el establecimiento de conexión (SYN/SYN-ACK/ACK) y el posterior \textit{handshake TLS} (por ejemplo, \textit{Client Hello}).}
-\end{figure}
+\subsubsection{Compilación}
+
+\begin{lstlisting}[language=C, caption={}]
+gcc broker/src/broker_common.c broker/src/broker_tcp.c -o broker/out/broker_tcp -Wall -Wextra -std=c11 -O2
+
+gcc broker/src/broker_common.c broker/src/broker_udp.c -o broker/out/broker_udp -Wall -Wextra -std=c11 -O2
+
+gcc subscriber/src/subscriber_common.c subscriber/src/subscriber_tcp.c -o subscriber/out/subscriber_tcp -Wall -Wextra -std=c11 -O2
+
+gcc subscriber/src/subscriber_common.c subscriber/src/subscriber_udp.c -o subscriber/out/subscriber_udp -Wall -Wextra -std=c11 -O2
+
+gcc publisher/src/publisher_common.c publisher/src/publisher_tcp.c -o publisher/out/publisher_tcp -Wall -Wextra -std=c11 -O2
+
+gcc publisher/src/publisher_common.c publisher/src/publisher_udp.c -o publisher/out/publisher_udp -Wall -Wextra -std=c11 -O2
+\end{lstlisting}
+
+\subsubsection{Ejecución}
+Cada uno se corre en su propio tab en la terminal...
+\\
+\\
+Broker
+\begin{lstlisting}[language=C, caption={}]
+./broker/out/broker_tcp 5050
+\end{lstlisting}
+Subscriber 1
+\begin{lstlisting}[language=C, caption={}]
+./subscriber/out/subscriber_tcp 127.0.0.1 5050 RealMadrid_vs_Juventus Liverpool_vs_BayernMunich Barcelona_vs_PSG
+\end{lstlisting}
+Subscriber 2
+\begin{lstlisting}[language=C, caption={}]
+./subscriber/out/subscriber_tcp 127.0.0.1 5050 RealMadrid_vs_Juventus
+\end{lstlisting}
+Subscriber 3
+\begin{lstlisting}[language=C, caption={}]
+./subscriber/out/subscriber_tcp 127.0.0.1 5050 Liverpool_vs_BayernMunich
+\end{lstlisting}
+Subscriber 4
+\begin{lstlisting}[language=C, caption={}]
+./subscriber/out/subscriber_tcp 127.0.0.1 5050  Barcelona_vs_PSG Liverpool_vs_BayernMunich 
+\end{lstlisting}
+Publisher 1
+\begin{lstlisting}[language=C, caption={}]
+./publisher/out/publisher_tcp 127.0.0.1 5050 RealMadrid_vs_Juventus --demo
+\end{lstlisting}
+Publisher 2
+\begin{lstlisting}[language=C, caption={}]
+./publisher/out/publisher_tcp 127.0.0.1 5050 Liverpool_vs_BayernMunich --demo
+\end{lstlisting}
+Publisher 3
+\begin{lstlisting}[language=C, caption={}]
+./publisher/out/publisher_udp 127.0.0.1 5050 Barcelona_vs_PSG --demo
+\end{lstlisting}
+
+
+\subsection{Publicador}
+\subsubsection{Descripción}
+El publicador es el componente encargado de generar y enviar los mensajes correspondientes a los eventos de cada partido. Existen dos versiones: una basada en TCP y otra en UDP, que utilizan el mismo módulo de simulación pero son distintos en la forma en que transmiten los datos.
+
+\begin{itemize}
+    \item En la versión TCP, el publicador establece una conexión confiable con el broker mediante un socket orientado a conexión. Una vez conectado, envía los eventos de forma secuencial usando la función \texttt{sendTo()}, garantizando que los mensajes lleguen en orden y sin pérdidas.
+    \item En la versión UDP, el publicador utiliza un socket sin conexión, enviando cada evento mediante \texttt{send()} al puerto del broker especificado Es necesario usar esta función ya que UDP no establece un 3-way handshake entonces hay que identificar el suscriptor para enviar el evento). Aunque este método no asegura la entrega o el orden de los mensajes, permite una transmisión más rápida y ligera, simulando escenarios donde la inmediatez es prioritaria sobre la confiabilidad.
+\end{itemize}
+
+En ambos casos, los mensajes se formatean con el tema del partido y el tipo de evento, y se envían con un intervalo de aproximadamente un segundo entre ellos. 
+
+Cada mensaje del publicador sigue el siguiente formato:
+
+\begin{lstlisting}[language=C, caption={}]
+<Match_name>|[EVENT_TYPE] <Event description> at <minute>' -- <TeamA> <scoreA>-<scoreB> <TeamB>
+\end{lstlisting}
+
+\subsubsection{Tipos de eventos}
+\textbf{Estructura de partido:}
+
+Cada partido dura 90 minutos y es dividido en 12 eventos. Para cada evento del partido, se elige un tiempo aleatorio entre rangos de valores de cada "bucket" de tiempo. Por ejemplo, el primer bucket incluye minutos del [1-7] entonces estos son posibles valores para lanzar el primer evento del partido. 
+Cada uno de los 10 eventos del partido puede pertenecer a una de las siguientes categorías:
+\begin{itemize}
+    \item \textbf{[GOAL]} – algún jugador anota un gol y otro jugador marca la asistencia
+    \item \textbf{[CARD]} – algún jugador recibe tarjeta amarilla o tarheta roja
+    \item \textbf{[SUB]} – algún jugador que está jugando en el campo es reemplazado por algún jugador que está en la banca del mismo equipo y aún no ha jugado en ese partido. (solo sucede después de 55') 
+    \item \textbf{[HT]} – indica el marcador en el mediotiempo (45')
+    \item \textbf{[FT]} – indica el marcador final (90')
+\end{itemize}
+\subsubsection{Reglas de negocio}
+
+\paragraph{Tarjetas}
+\begin{itemize}
+\item La primera vez que un jugador es señalado, se le muestra la tarjeta amarilla
+\item La segunda vez que un jugador es señalado, se le muestra la tarjeta roja y es expulsado del partido dejando al equipo con 10 hombres en el campo
+\item 20\% de las veces en cualquier evento, a un jugador se le puede mostrar una tarajeta roja directa
+\end{itemize}
+
+\paragraph{Anotar}
+\begin{itemize}
+\item El sistema elige uno de los dos equipos para anotar cuando se genera un evento de tipo [GOAL]
+\item El jugador solo se elige si no ha sido expulsado (igual que el jugador que da la asistencia)
+\end{itemize}
+
+\subsection{Broker}
+\subsubsection{Descripción}
+El broker actúa como un intermediario entre los publicadores y los suscriptores dentro del sistema de notificaciones de eventos. El broker recibe los mensajes enviados por los publicadores (a través de TCP o UDP), identifica el partido al que pertenecen y los reenvia únicamente a los suscriptores que estén suscritos a ese partido.
+
+Cada suscriptor envía un mensaje al broker que indica el interés en un partido. El broker guarda esa suscripción en una tabla interna de partidos y cada vez que llega un mensaje con ese mismo nombre de partido, lo reenvía a todos los suscriptores asociados.
+
+(El broker no contiene lógica de negocio, ya que su función se limita al enrutamiento de mensajes. No interpreta el contenido de los eventos, ya que solo actúa como un intermediario que se encarga de que cada suscriptor reciba únicamente la información correspondiente a los partidos a los que está suscrito.)
+
+\subsection{Suscriptor}
+\subsubsection{Descripción}
+El suscriptor representa al cliente final que recibe los eventos transmitidos por el sistema. Su función principal es conectarse al broker (mediante TCP o UDP) y registrarse en uno o varios temas específicos, enviando un mensaje con el siguiente formato:
+
+\begin{lstlisting}[language=C, caption={}]
+SUBSCRIBE|<topic_1> <topic_2> ... <topic_n> 
+\end{lstlisting}
+
+Una vez suscrito, el suscriptor permanece a la espera de mensajes provenientes del broker. Cada mensaje recibido tiene información sobre un evento en tiempo real que corresponde a los partidos a los que se ha suscrito.
+
+En la versión TCP, el suscriptor mantiene una conexión persistente con el broker y recibe los mensajes mediante \texttt{recv()}. En la versión UDP, no existe una conexión formal, sino que los mensajes llegan directamente al puerto local asociado al socket mediante \texttt{recvfrom()}.
 
 %==============================================================
-%=================== Evidencia de Capas =======================
+%=======================   2   ================================
 %==============================================================
-\subsection*{Análisis de la Capa de Aplicación (TLS)}
+\section{Pruebas y comparación}
+En esta sección, verificamos el funcionamiento del modelo de comunicación. 
+\subsection{TCP}
+TCP es el protocolo que tiene envío de paquetes confiable, los mensajes llegan ordenados, y require una conexión persistente que se establece con un handshake. El flujo que sigue nuestra aplicación se describe a continuación:
 
-Durante el \textit{handshake TLS}, el cliente envía un \texttt{Client Hello} indicando versiones soportadas (TLS 1.2/1.3), \textit{cipher suites} y el nombre del servidor (\textit{SNI}). 
-El servidor responde con \texttt{Server Hello} seleccionando parámetros criptográficos y entrega su \textit{Certificate} (X.509) para autenticación. 
-Tras la negociación de claves, la sesión opera con \texttt{Application Data} (HTTP cifrado).
+\begin{enumerate}
+    \item El broker crea un socket y escucha en un puerto esperando conexiones de publicadores y suscriptores. 
+    \item Los suscriptores se conectan al broker por medio de conexión TCP usando el 3-way handsahke (SYN, SYN-ACK, ACK).
+    \item El suscriptor manda un mensaje al broker que contiene las suscripciones que quiere.
+    \item Los publicadores establecen una conexión TCP con el broker.
+    \item Los publicadores envían eventos de partidos al broker.
+    \item El broker identifica los suscriptores que están suscritos a los partidos asociados a los eventos que llegan de los publicadores.
+    \item El broker envía los mensajes de los eventos por medio de la conexión TCP a los suscriptores.
+    \item El suscriptor recibe y muestra el mensaje de cada evento.
+    \item Se cierran las conexiones de los publicadores automaticamente después de enviar el último evento  (los suscriptores siguen escuchando hasta desconectarse manualmente).
+\end{enumerate}
+
+\subsubsection{Conexión suscriptores a broker}
+Primero, vamos a demostrar que los suscriptores establecen un 3-way handshake con el broker. En los screenshots vemos que el suscriptor \#1 y el suscriptor \#3 hace bind con un puerto aleatorio, establace el handshake, y envía mensajes al broker indicando los partidos a los que se quiere suscribir. (para evitar redundancia solo se analizan los suscriptores 1 y 3)
+\\
+\\
+\\
+En las captura de Wireshark, los segmentos TCP con las banderas PSH y ACK indican que el emisor está enviando datos que deben entregarse inmediatamente a la aplicación receptora, sin esperar más bytes en el búfer. El campo Seq (secuencia) muestra el número del primer byte transmitido en ese segmento, mientras que Ack (acuse) confirma los bytes recibidos del otro extremo. Por ejemplo, un paquete con Seq=1 seguido de otro con Seq=34 significa que el primer mensaje contenía 33 bytes y que el segundo continúa justo después, reflejando la naturaleza secuencial y confiable de la transmisión TCP.
+\\
+
+\textbf{Suscriptor \#1 (Puerto 64376)}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{lab-02-screenshots/8.5-CapaAplicacion-HTTPS.png}
-    \caption{\texttt{Client Hello} hacia \texttt{www.uniandes.edu.co}. Se observan extensiones TLS (p.\,ej., \textit{supported\_versions}, \textit{server\_name}).}
+    \includegraphics[width=1.0\textwidth]{screenshots/tcp-screenshots/tcp-1-handshake.png}
+    \caption{Conexión de suscriptor 1}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{lab-02-screenshots/8.5-CapaAplicacion-Youtube.png}
-    \caption{\texttt{Client Hello} hacia \texttt{accounts.youtube.com}. Se evidencia el uso de TLS 1.2/1.3, \textit{cipher suites} ofrecidas y el SNI del host.}
+    \includegraphics[width=1.0\textwidth]{screenshots/tcp-screenshots/tcp-1-console.png}
+    \caption{Verificación de conexión de suscriptor 1 en la terminal de suscriptor}
 \end{figure}
 
-\noindent\textit{Implicación:} la capa de aplicación expone la negociación TLS, pero el contenido HTTP queda cifrado.
-
-%--------------------------------------------------------------
-\subsection*{Análisis de la Capa de Transporte (TCP)}
-
-HTTPS requiere de TCP para asegurar fiabilidad (entrega ordenada, control de congestión) y se inicia con el \textit{three-way handshake} (SYN, SYN-ACK, ACK). 
-En las capturas se aprecian campos como puertos origen/destino, números de secuencia, ventana y flags (\texttt{PSH}, \texttt{ACK}), además del \textit{payload} que TLS cifra.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{lab-02-screenshots/8.5-CapaTransporte-HTTPS.png}
-    \caption{Detalle TCP hacia \texttt{www.bancolombia.com}: puertos, números de secuencia/ack, ventana y \texttt{TCP payload} (transportado por TLS).}
+    \includegraphics[width=.85\textwidth]{screenshots/tcp-screenshots/tcp-1-sus-1.png}
+    \caption{Mensaje de suscripción al broker}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.9\textwidth]{lab-02-screenshots/8.5-CapaTransporte-Youtube.png}
-    \caption{Paquete TCP en conexión a YouTube mostrando longitud de segmento, flags y \texttt{TCP payload}; el contenido de aplicación va cifrado por TLS.}
-\end{figure}
+    \includegraphics[width=1.0\textwidth]{screenshots/tcp-screenshots/tcp-1-broker-conn.png}
+    \caption{Suscripciones de suscriptor 1 en terminal del broker}
+\end{figure}    
 
-%==============================================================
-%=================== Evidencia por Sitio ======================
-%==============================================================
-\subsection*{Evidencia de paquetes HTTPS por sitio web}
+\newpage
+\vspace{1mm} % Add vertical space above the line
+\noindent\rule{\linewidth}{0.4pt} % Draw a horizontal line across the text width
+\vspace{1mm} % Add vertical space below the line
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.95\textwidth]{lab-02-screenshots/8.5-HTTPS-bancolombia.png}
-    \caption{\texttt{Client Hello} hacia \texttt{www.bancolombia.com} (TLS 1.3). Evidencia del inicio del \textit{handshake} y establecimiento de un canal cifrado adecuado para datos financieros.}
-\end{figure}
+\textbf{Suscriptor \#3 (Puerto 64378)}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.95\textwidth]{lab-02-screenshots/8.5-HTTPS-elespectador.png}
-    \caption{Conexión a \texttt{www.elespectador.com}. Se visualiza \texttt{Client Hello} (TLS 1.2) y, a continuación, \texttt{Application Data} (HTTP sobre TLS).}
+    \includegraphics[width=1.0\textwidth]{screenshots/tcp-screenshots/tcp-3-handshake.png}
+    \caption{Conexión de suscriptor 3}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.95\textwidth]{lab-02-screenshots/8.5-HTTPS-eltiempo.png}
-    \caption{Tráfico hacia \texttt{www.eltiempo.com}: \texttt{Client Hello} en TLS 1.3 seguido de \texttt{Server Hello}/\texttt{Change Cipher Spec} y \texttt{Application Data}.}
+    \includegraphics[width=1.0\textwidth]{screenshots/tcp-screenshots/tcp-3-console.png}
+    \caption{Verificación de conexión de suscriptor 3 en la terminal de suscriptor}
+\end{figure}
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.85\textwidth]{screenshots/tcp-screenshots/tcp-3-sus-1.png}
+    \caption{Mensaje de suscripción al broker}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.95\textwidth]{lab-02-screenshots/8.5-HTTPS-uniandes.png}
-    \caption{Tráfico hacia \texttt{www.uniandes.edu.co}. Evidencia de \texttt{Client Hello} con SNI del host y negociación de versiones/cifrados.}
-\end{figure}
+    \includegraphics[width=1.0\textwidth]{screenshots/tcp-screenshots/tcp-3-broker-conn.png}
+    \caption{Suscripciones de suscriptor 3 en terminal del broker}
+\end{figure}    
 
-%--------------------------------------------------------------
-\subsection*{Evidencia de paquetes en YouTube}
+\vspace{1mm} % Add vertical space above the line
+\noindent\rule{\linewidth}{0.4pt} % Draw a horizontal line across the text width
+\vspace{1mm} % Add vertical space below the line
+
+
+Cada vez que el broker detecta un partido nuevo, crea una fila en la tabla interna y si llega un suscriptor futuro que quiere recibir eventos de ese partido, solo lo asigna en la tabla.
+
+Luego de establecer la conexión y registrar los partidos que quiere escuchar, el broker queda pendiente de mensajes con eventos de los publicadores. 
+
+\subsubsection{Transmisión de eventos}
+
+Como se menciona anteriormente, cada publicador también establece una conexión TCP por medio de 3-way handshake y luego envía los eventos al broker. (Por simplicidad, solo voy a detallar en Wireshark los mensajes enviados de un publicador pero al final muestro los eventos que cada publicador envió)
+
+\textbf{Publicador \#1 (Puerto 64380)}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.95\textwidth]{lab-02-screenshots/8.5-Packets-Youtube.png}
-    \caption{Listado filtrado por \texttt{tcp.port == 443} con conexiones a \texttt{youtube.com}. Se observan \textit{handshake TLS} y posteriormente \texttt{Application Data}.}
-\end{figure}
+    \includegraphics[width=1.0\textwidth]{screenshots/tcp-screenshots/pub-1-handshake.png}
+    \caption{Conexión de publicador 1 al broker}
+\end{figure} 
+
+Para evitar redundancia en el informe, adjunto un sampleo de 3 eventos (de los 12) para el partido Real Madrid vs Juventus. 
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.95\textwidth]{lab-02-screenshots/8.5-Paquete-Youtube.png}
-    \caption{Detalle de un paquete TLS asociado a YouTube: la capa de aplicación aparece como \texttt{Application Data}, confirmando el cifrado del contenido HTTP.}
-\end{figure}
+    \includegraphics[width=.85\textwidth]{screenshots/tcp-screenshots/pub-2-mensajes.png}
+    \caption{Mensajes enviados al broker}
+\end{figure} 
 
-%==============================================================
-%======================= Tablas (opc) =========================
-%==============================================================
-\subsection*{Ejemplos de paquetes (tabla)}
-% Requiere \usepackage{array} si deseas columnas con p{..}
+En la siguiente gráfica, muestro el log del broker de los mensajes que van llegando de los publicadores y se reenvían a los suscriptores..
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.85\textwidth]{screenshots/tcp-screenshots/broker-event-feed.png}
+    \caption{Broker logs}
+\end{figure} 
+
+En lo próxima captura, se ven todos los paquetes que recibe suscriptor 1 de los varios publicadores (mesnajes despachados por el broker)
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.85\textwidth]{screenshots/tcp-screenshots/sus-1-rec.png}
+    \caption{Mensajes recibidos por suscriptor 1}
+\end{figure} 
+
+En las capturas siguientes, se ven los mensajes generados por los publicadores:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.85\textwidth]{screenshots/tcp-screenshots/mad_juv.png}
+    \caption{Real Madrid vs Juventus}
+\end{figure} 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.85\textwidth]{screenshots/tcp-screenshots/liv_bay.png}
+    \caption{Liverpool vs Bayern Munich}
+\end{figure} 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.85\textwidth]{screenshots/tcp-screenshots/bar_psg.png}
+    \caption{Barcelona vs PSG}
+\end{figure} 
+
+En las capturas siguientes, se ven los mensajes recibidos del broker que fueron enviados por los publicadores:
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.85\textwidth]{screenshots/tcp-screenshots/sus-1-all.png}
+    \caption{Suscriptor 1}
+\end{figure} 
+
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.85\textwidth]{screenshots/tcp-screenshots/sus-2-all}
+   \caption{Suscriptor 2}
+\end{figure} 
+
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.85\textwidth]{screenshots/tcp-screenshots/sus-3-all}
+    \caption{Suscriptor 3}
+\end{figure} 
+
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.85\textwidth]{screenshots/tcp-screenshots/sus-4-all}
+    \caption{Suscriptor 4}
+\end{figure} 
+
+\subsection{UDP}
+TCP es el protocolo que tiene envío de sin handshake, es más rápido que TCP pero no es confiable ya que algunos mensajes podrían no llegar o llegar fuera de orden. El flujo que sigue nuestra aplicación se describe a continuación:
+
+
+\begin{enumerate}
+    \item El broker crea un socket UDP y escucha en un puerto esperando conexiones de publicadores y suscriptores. 
+    \item Los suscriptores crean un socket UDP y se vincula a un puerto aleatorio.
+    \item El suscriptor manda un mensaje al broker que contiene las suscripciones que quiere.
+    \item Los publicadores crean un socket UDP (no hay necesidad de un handshake).
+    \item Los publicadores envían eventos de partidos al broker.
+    \item El broker busca todos los suscriptores de los partidos según los eventos que llegan.
+    \item El broker envía el evento a cada IP/puerto que corresponde.
+    \item El suscriptor recibe y muestra el mensaje de cada evento.
+\end{enumerate}
+
+Primero mostramos como el suscriptor 1 manda mensajes al broker indicando a cuales partidos se va a suscribir:
+
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{screenshots/udp-screenshots/conexión_UDP.png}
+    \caption{Suscriptor 1 enviando mensajes a broker en UDP}
+\end{figure} 
+
+En la próxima image, mostramos una captura del terminal del suscriptor indicando que ha enviado mensajes al broker:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{screenshots/udp-screenshots/sub-1-conn.png}
+    \caption{Suscriptor 1 enviando mensajes a broker en UDP (terminal)}
+\end{figure} 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1.0\textwidth]{screenshots/udp-screenshots/sub-1-broker.png}
+    \caption{Suscriptor 1 en los logs del broker}
+\end{figure} 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.85\textwidth]{screenshots/udp-screenshots/sub-1-msj.png}
+    \caption{Suscripciones enviadas al broker por suscripcion 1}
+\end{figure} 
+
+En el siguiente screenshot se ven los datos que los publicadores han enviado al broker y se han despachado a los suscriptres:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.85\textwidth]{screenshots/udp-screenshots/datos.png}
+    \caption{Mensajes de eventos de partidos UDP}
+\end{figure} 
+
+Enseguida, estan las capturas completas de UDP:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.85\textwidth]{screenshots/udp-screenshots/broker.png}
+    \caption{Log de broker completo}
+\end{figure} 
+
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.85\textwidth]{screenshots/udp-screenshots/sub1.png}
+    \caption{Log de Suscriptor 1}
+\end{figure} 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.85\textwidth]{screenshots/udp-screenshots/sub2.png}
+    \caption{Log de Suscriptor 2}
+\end{figure} 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.85\textwidth]{screenshots/udp-screenshots/sub3.png}
+    \caption{Log de Suscriptor 3}
+\end{figure} 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.85\textwidth]{screenshots/udp-screenshots/sub4.png}
+    \caption{Log de Suscriptor 4}
+\end{figure} 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.85\textwidth]{screenshots/udp-screenshots/pub1.png}
+    \caption{Eventos de publicador 1}
+\end{figure} 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.85\textwidth]{screenshots/udp-screenshots/pub2.png}
+    \caption{Eventos de publicador 2}
+\end{figure} 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.85\textwidth]{screenshots/udp-screenshots/pub3.png}
+    \caption{Eventos de publicador 3}
+\end{figure} 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\section{Preguntas de análisis}
+\section{Tabla comparativa}
 \begin{table}[H]
 \centering
-\caption{Ejemplos representativos de paquetes capturados (YouTube)}
-\begin{tabular}{|c|c|c|c|c|}
+\begin{tabular}{|l|c|c|c|c|c|c|c|}
 \hline
-\textbf{Fuente} & \textbf{Destino} & \textbf{Protocolo} & \textbf{Puerto Origen} & \textbf{Puerto Destino} \\
-\hline
-192.168.1.13 & \textit{YouTube/Google IP} & TCP (TLS 1.3) & \textit{efímero} & 443 \\
-192.168.1.13 & \textit{YouTube/Google IP} & TCP (TLS 1.2) & \textit{efímero} & 443 \\
-\hline
+\textbf{Protocolo} & \textbf{Total Paquetes} & \textbf{Total Bytes} & \textbf{Duración (s)} & \textbf{Paquetes/s} & \textbf{Bytes/s} & \textbf{Retransmisiones (\%)} & \textbf{Overhead (bytes)} \\ \hline
+TCP & 292 & 26,773 & 24.69 & 11.83 & 1,084.27 & 47.6 & 40 \\ \hline
+UDP & 149 & 16,859 & 603.64 & 0.25 & 27.93 & N/A & 28 \\ \hline
 \end{tabular}
+\caption{Resultados experimentales del análisis comparativo entre los protocolos TCP y UDP.}
+\label{tab:tcp_udp_overhead}
 \end{table}
 
-\begin{table}[H]
-\centering
-\caption{Ejemplos representativos de paquetes (otros sitios HTTPS)}
-\begin{tabular}{|c|c|c|c|c|}
-\hline
-\textbf{Fuente} & \textbf{Destino} & \textbf{Protocolo} & \textbf{Puerto Origen} & \textbf{Puerto Destino} \\
-\hline
-192.168.1.13 & \textit{bancolombia.com (IP)} & TCP (TLS 1.3) & \textit{efímero} & 443 \\
-192.168.1.13 & \textit{uniandes.edu.co (IP)} & TCP (TLS 1.2/1.3) & \textit{efímero} & 443 \\
-\hline
-\end{tabular}
-\end{table}
+\section{Análisis de Resultados del Laboratorio}
 
-%==============================================================
-%==================== Cierre/Análisis =========================
-%==============================================================
-\subsection*{Conclusiones generales}
-\begin{itemize}
-    \item HTTPS combina HTTP con TLS sobre TCP/443, garantizando \textbf{confidencialidad}, \textbf{integridad} y \textbf{autenticación} del servidor mediante certificados X.509.
-    \item Las capturas muestran el \textbf{handshake TLS} (\texttt{Client Hello}, \texttt{Server Hello}, \texttt{Certificate}) seguido de \texttt{Application Data} (HTTP cifrado), por lo cual el contenido de aplicación no es legible.
-    \item El uso de TCP evidencia control de fiabilidad (SYN/SYN-ACK/ACK, números de secuencia, ventanas y \texttt{ACKs}).
-    \item En YouTube se observan múltiples flujos cifrados (\texttt{Application Data}) por la naturaleza de \textit{streaming} y recursos; en los demás sitios se confirma el mismo patrón de seguridad.
-\end{itemize}
+\subsection{¿Qué ocurriría si en lugar de dos publicadores hubiera cien partidos simultáneos?}
+Si se aumentara el número de publicadores a cien, el desempeño del \textit{broker} dependería mucho del protocolo utilizado. 
 
+Con \textbf{TCP}, cada publicador necesita su propia conexión, por lo que el \textit{broker} debe mantener información de estado, buffers y descriptores de archivo por cada una. Esto hace que el consumo de memoria y CPU crezca de forma proporcional al número de conexiones. Además, si una de ellas es lenta, puede afectar la velocidad general de entrega por los mecanismos de control de flujo.
 
+En cambio, con \textbf{UDP} el \textit{broker} no conserva estado por conexión. Solo recibe y procesa los datagramas, lo cual permite manejar un volumen mayor de emisores con menor carga en el sistema. Sin embargo, también hay un mayor riesgo de pérdida de paquetes si la red se satura.
 
-%==============================================================
-%=====================   8.6  ================================
-%==============================================================
-\renewcommand{\thesection}{8.\arabic{section}}
-\section{Análisis del protocolo VoIP}
-\subsection{Establecimiento de la llamada}
+En resumen, TCP ofrece mayor confiabilidad, pero UDP resulta más liviano y escalable cuando el número de publicadores es muy alto.
 
-Empezaremos describiendo como se establece la conexion entre el servidor y aquellos clientes que se conectan para establecer las llamadas. Para esto, se hace uso del protocolo de capa de aplicacion SIP (Session Initiation Protocol) por el cual utilizara codigos de estados, (muy parecido a como funciona en HTTP) para indicar si el cliente se le permite establecer conexion para poder realizar las llamadas. A continuacion podremos ver como funciona este proceso:
+\subsection{Si un gol se envía como mensaje y un suscriptor no lo recibe en UDP, ¿qué implicaciones tendría?}
+En UDP, si un mensaje se pierde, el suscriptor simplemente no lo recibe. Esto podría generar que algunos usuarios no vean actualizaciones importantes como un gol, provocando desincronización entre los diferentes clientes.
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.95\textwidth]{lab-02-screenshots/8.6-inicioLlamada.png}
-    \caption{Proceso de registro usando el protocolo SIP.}
-\end{figure}
+TCP maneja mejor este tipo de situaciones, ya que garantiza que todos los mensajes lleguen al destino, aunque sea con un pequeño retraso. En una aplicación en tiempo real, la pérdida de un mensaje importante puede ser más perjudicial que un ligero aumento de la latencia, por lo que TCP sería más apropiado en este caso.
 
-Aqui podemos ver como incialmente el cliente envia un request \textit{REGISTER} cuya respuesta es conexion con el servidor con el codigo de estatus \textit{401 Unauthorized}, esto porque introducimos una contraseña incorrecta; despues de esto se vuelve a intentar el registro del cliente, seguido por una respuesta de codigo de estado \textit{200 OK (REGISTER)}.
-\subsection*{Uso de la capa de aplicacion}
-Para el caso de las llamadas de aplicacion usadas por VoIP, solo tenemos el protocolo \textbf{SIP} utilizado para el registro de los clientes, su autorizacion y el manejo de sesion. A continuacion veremos mas a detalle el contenido de estos paquetes y los encabezados que utiliza.
+\subsection{Protocolo más adecuado para seguimiento en vivo de partidos}
+La elección del protocolo depende del tipo de información que se transmite. Para eventos críticos como goles o tarjetas, lo ideal es usar \textbf{TCP}, ya que asegura que el mensaje llegue completo y en orden. En cambio, para datos que se actualizan constantemente y que pueden tolerar alguna pérdida, como estadísticas o posiciones, \textbf{UDP} es más eficiente por su baja latencia.
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.95\textwidth]{lab-02-screenshots/8.6-SIPDetail.png}
-    \caption{Detalle del uso del protocolo SIP.}
-\end{figure}
+En las pruebas del laboratorio se observó que TCP entregó todos los mensajes de forma ordenada, mientras que UDP tuvo algunas pérdidas y reordenamientos. Por lo tanto, una solución híbrida podría ser la más adecuada en un escenario real, aunque agrega complejidad a la capa de aplicación.
 
-Aqui vemos que utliza como metodo \textit{REGISTER} y que dentro del \textbf{header} tenemos: 
-\begin{itemize}
-    \item \textbf{Request-Line:} Indica el método SIP y la dirección del servidor al que se envía la petición. 
-    En este caso: \texttt{REGISTER sip:172.20.10.9;transport=UDP SIP/2.0}.
-    
-    \item \textbf{Method (REGISTER):} Es el tipo de solicitud SIP. \texttt{REGISTER} sirve para registrar un usuario en el servidor SIP.
+\subsection{Comparación de overhead entre TCP y UDP}
+El protocolo TCP utiliza más cabeceras (20 bytes de IP más 20 bytes de TCP) que UDP (20 bytes de IP más 8 bytes de UDP). Esa diferencia, aunque parezca pequeña, puede ser significativa cuando los mensajes son cortos o muy frecuentes. 
 
-    \item \textbf{Request-URI:} Dirección (URI) del servidor SIP al cual se envía la petición de registro.
+En términos de eficiencia, UDP transmite más información útil por cada paquete, pero TCP compensa su sobrecarga con la ventaja de garantizar la entrega y el orden de los datos.
 
-    \item \textbf{Via:} Define la ruta de transporte usada (UDP, en este caso) e incluye la IP y puerto del cliente. 
-    También lleva el parámetro \texttt{branch} para identificar de forma única la transacción SIP.
+\subsection{Efecto de desorden en UDP y posibles soluciones}
+Cuando los mensajes llegan fuera de orden, como si primero se recibiera el marcador 2--1 y luego el 1--1, la experiencia del usuario se ve afectada y puede generar confusión. 
 
-    \item \textbf{Max-Forwards:} Número máximo de saltos (hops) que el mensaje puede atravesar. Similar al TTL en IP.
+Para evitarlo, la aplicación puede incluir un número de secuencia o una marca de tiempo en cada mensaje, y procesarlos solo si son más recientes que el último recibido. También se pueden implementar confirmaciones (\textit{ACKs}), retransmisiones selectivas o pequeños buffers que reordenen los mensajes antes de mostrarlos. Basicamente, se termina implementando un protocolo más parecido a quic, con mayor cantidad de bits en el header del mensaje para facilitar su organizacion.
 
-    \item \textbf{Contact:} Dirección de contacto del usuario (su ubicación actual, con IP y puerto) donde puede recibir llamadas.
+\subsection{Efecto del número de suscriptores sobre el desempeño}
+Con TCP, cada suscriptor tiene su propia conexión con el \textit{broker}, por lo que al aumentar el número de suscriptores, también crece la carga en memoria y CPU y el uso del buffer por cada una de las conexiones. Además, el mismo mensaje debe enviarse de manera individual a cada cliente, lo que multiplica el tráfico.
 
-    \item \textbf{To:} Identifica la identidad (usuario SIP) que está siendo registrado en el servidor.
+Con UDP, el envío se realiza mediante datagramas y no se mantiene una conexión por cliente. Si la red soporta \textit{multicast}, se puede enviar una sola copia del mensaje a todos los suscriptores al mismo tiempo, lo que mejora notablemente la eficiencia. 
 
-    \item \textbf{From:} Dirección de origen del mensaje SIP. Incluye el identificador del usuario que hace el registro.
+Basicamente, y como lo hemos mencionado anteriormente, UDP resulta mucho más rapido y eficiente, pero no es confiable como TCP.
 
-    \item \textbf{Call-ID:} Identificador único de la sesión SIP. Sirve para distinguir distintas llamadas o registros.
+\subsection{Comportamiento ante caída del broker}
+Si el \textit{broker} se detiene, las consecuencias son diferentes según el protocolo:
 
-    \item \textbf{CSeq (Sequence):} Número de secuencia que combina un número incremental y el método (\texttt{REGISTER}).
-    Garantiza el orden correcto de los mensajes.
+Con \textbf{TCP}, las conexiones se cierran o marcan error (esto a causa de que dejara de recibir los ACK que deberia dentro de las ventanas hasta que se cumpla ese timeout designado=, y tanto publicadores como suscriptores pueden detectar rápidamente la desconexión. Sin embargo, los mensajes que no se hayan entregado se pierden si el sistema no guarda persistencia.
 
-    \item \textbf{Expires:} Tiempo (en segundos) que dura el registro antes de que expire y deba renovarse.
+En cambio, con \textbf{UDP}, los publicadores seguirán enviando mensajes, pero estos se perderán sin que nadie lo note. Los clientes tampoco sabrán que el \textit{broker} dejó de funcionar.
 
-    \item \textbf{Allow:} Lista de métodos SIP que soporta este cliente (ej. INVITE, BYE, CANCEL, MESSAGE).
+Por lo tanto, TCP facilita la detección de fallos, aunque ninguno de los dos protocolos garantiza la recuperación automática sin mecanismos adicionales.
 
-    \item \textbf{Supported:} Extensiones opcionales de SIP que el cliente entiende (ej. \texttt{replaces}, \texttt{timer}, \texttt{outbound}).
+\subsection{Sincronización simultánea de actualizaciones críticas}
+Esto es algo que es casi imposible, pues la velocidad a la que le llegan los paquetes depende de muchas fuentes de delay (delay por distancia, posibles cuellos de botella en la red de cada suscriber, etc), no solo del protocolo o de la capacidad del servidor. Teniendo esto en cuenta, se tendria que, a nivel de la capa de aplicacion ingresar logica para que ya recibido un mensaje que espere a que sea cierta hora para asegurar que a todos se les mostro de manera simultanea. 
 
-    \item \textbf{User-Agent:} Información del software cliente utilizado (en este caso, Zoiper v2.10.20.4.1).
+Ahora bien, si miramos que protocolo es el que facilita la implementacion enfocandonos en la capa de transporte, el protocolo a elegir seria UDP, ya que en comparacion es mucho mas rapido que TCP, llevando que esa sensacion de sincronizacion simultanea sea mas factible de conseguir (por lo menos en aquellos que si reciben su notificacion) razon tambien por la que este protocolo es el mas utilizado en videojuegos en linea que son en tiempo real. 
 
-    \item \textbf{Authorization:} Cabecera de autenticación digest. Contiene el usuario, realm, nonce y un hash de la contraseña
-    para validar credenciales contra el servidor.
+\subsection{Uso de CPU y memoria en el broker}
+Como lo mencionamos anteriormente, con TCP, el \textit{broker} debe mantener información de cada conexión, incluyendo buffers, estados de ventana y retransmisiones. Esto hace que el consumo de memoria crezca con el número de clientes. 
 
-    \item \textbf{Allow-Events:} Tipos de eventos SIP que el cliente soporta para suscripciones (\texttt{presence}, \texttt{talk}, etc.).
-
-    \item \textbf{Content-Length:} Longitud del cuerpo del mensaje. Aquí es \texttt{0} porque este REGISTER no lleva cuerpo.
-\end{itemize}
-Finalmente, vale la pena mencionar que el protocolo utilizado por este puerto es el 5060. 
-\subsection{Durante la llamada}
-\subsection*{capa de transporte}
-Ahora bien, durante la llamada el protocolo que se usara para enviar los paquetes sera el de \textbf{UDP} pertenenciente a la capa de transporte, y como lo mencionamos anteriormente, \textbf{SIP} para el manejo de sesion, autorizacion y registro.  Es importante resaltar que en este tipo de servidores tambien se espera ver el uso del protocolo \textbf{RTP} para el transporte de los medios durante la llamada, sin embargo, en el caso de estas llamadas no observamos ningun paquete que lo utilizara, esto porque probablemente wireshark no reconocio el flujo de paquetes \textbf{UDP} como el correspondiente \textbf{RTP}. Ahora si, veamos el funcionamiento del \textbf{UDP}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.95\textwidth]{lab-02-screenshots/8.6-DuranteLlamada.png}
-    \caption{Tráfico \textbf{UDP} correspondiente al flujo de voz (posible \textbf{RTP}) en una llamada \textbf{SIP}.}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.95\textwidth]{lab-02-screenshots/8.6-UDPDurante.png}
-    \caption{Detalle trafico protocolo \textbf{udp}.}
-\end{figure}
-A continuacion vemos el detalle de este paquete.
-\begin{itemize}
-    \item \textbf{Ethernet II}: comunicación entre las direcciones MAC \texttt{e4:0d:36:44:dc:02} (origen) y \texttt{b6:11:c3:79:96:97} (destino).
-    \item \textbf{IPv4}: paquete enviado desde \texttt{172.20.10.9} hacia \texttt{172.20.10.5}.
-    \item \textbf{UDP}: segmento con puerto de origen \texttt{10378} y puerto de destino \texttt{53720}, longitud de \texttt{180} bytes.
-    \item \textbf{Carga útil (172 bytes)}: corresponde al flujo de audio, probablemente un paquete \texttt{RTP} con datos de voz codificados.
-\end{itemize}
-\subsection*{Conclusiones generales}
-\begin{itemize}
-\item \textbf{Información de la capa de aplicación:} Para el registro y la gestión de la sesión, se utiliza el protocolo \textbf{SIP} (Session Initiation Protocol), que opera en la capa de aplicación. Este protocolo emplea métodos como \texttt{REGISTER} para autenticar a los clientes y establecer la conexión, y utiliza códigos de estado (similares a HTTP) para indicar el éxito o fracaso de las peticiones.
-\item \textbf{Protocolo de la capa de transporte:} Durante el proceso de registro y la transmisión de datos de voz, el protocolo de la capa de transporte utilizado es \textbf{UDP} (User Datagram Protocol). UDP se elige por ser un protocolo sin conexión que prioriza la velocidad sobre la fiabilidad, lo que es ideal para aplicaciones de tiempo real como la voz sobre IP (VoIP), donde una pequeña pérdida de paquetes es preferible a una latencia alta. Además, se menciona que el protocolo \textbf{RTP} (Real-time Transport Protocol), que también utiliza UDP, es el que se encarga de transportar la información de audio durante la llamada.
-\item \textbf{Puertos utilizados:} Se identifican los siguientes puertos: el puerto estándar \textbf{5060} se utiliza para la señalización y el registro de clientes a través de SIP, mientras que para el flujo de voz durante la llamada, se utilizan puertos dinámicos. En el ejemplo, el puerto de origen es \textbf{10378} y el de destino es \textbf{53720}.
-\end{itemize}
-%==============================================================
-%=====================   8.7   ================================
-%==============================================================
-\renewcommand{\thesection}{8.\arabic{section}}
-\section{Análisis del protocolo RTMP}
-\subsection{Inicio de la transmisión}
-
-Al iniciar la transmision se hace uso del protocolo \textbf{TCP} para establecer conexion entre el servidor y el cliente, esto se hace a traves del uso de las flags (\textit{SYN, ACK} y que de esta manera se establezca el three way handshake y poder proceder con el inicio del protocolo \textbf{RTMP} asi como se puede ver en las siguientes imagenes:
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.95\textwidth]{lab-02-screenshots/8.7-inicioTransmicion.png}
-    \caption{Conexion entre el cliente y el servidor usando TCP.}
-\end{figure}
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.95\textwidth]{lab-02-screenshots/8.7-detalleTCP.png}
-    \caption{Detalle trafico protocolo \textbf{TCP}.}
-\end{figure}
-
-\begin{itemize}
-    \item \textbf{Tipo de Paquete:} Es un segmento TCP (Transmission Control Protocol).
-    \item \textbf{Inicio de Conexión:} El flag \texttt{SYN} (Synchronize) está activado (marcado como \texttt{0x002}). Esto indica que el cliente está solicitando iniciar una nueva conexión con el servidor.
-    \item \textbf{Origen y Destino:} La comunicación se origina desde la dirección IP \texttt{172.28.10.7} en el puerto \texttt{1255} y se dirige a la IP \texttt{172.28.10.11} en el puerto \texttt{1955}.
-    \item \textbf{Número de Secuencia:} El número de secuencia inicial es 0, lo cual es típico al comenzar una conexión.
-\end{itemize}
-En este paquete encontramos la siguiente informacion:
-\begin{itemize}
-    \item \textbf{Puerto origen:} 2255
-    \item \textbf{Puerto destino:} 1935
-    \item \textbf{Número de secuencia:} 0 (relativo)
-    \item \textbf{Número de acuse:} 0
-    \item \textbf{Ventana:} 65535
-    \item \textbf{Longitud de cabecera:} 32 bytes
-    \item \textbf{Opciones:} MSS, NOP, Window Scale, NOP, NOP
-\end{itemize}
-
-\subsection{Conexion Streaming}
-
-Seguido a esto, se inicia la conexión usando el protocolo \textbf{RTMP} (\textit{Real-Time Messaging Protocol}), el cual funciona sobre TCP y está diseñado 
-para la transmisión en tiempo real de audio, video y datos a través de internet.  Su función principal es mantener una comunicación estable y de baja latencia entre un cliente y un servidor de medios, permitiendo la transmisión continua (\textit{streaming}) de contenidos multimedia. RTMP fragmenta los datos en mensajes y los envía de manera ordenada, garantizando sincronización y fluidez en la reproducción. A continuacion veremos como funciona segun lo capturado en wireshark:
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.95\textwidth]{lab-02-screenshots/8.7-rtmp1.png}
-    \caption{Detalle protocolo rtmp inicio.}
-\end{figure}
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.95\textwidth]{lab-02-screenshots/8.7-rtmp2.png}
-    \caption{Detalle protocolo rtmp durante la transmision.}
-\end{figure}
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.95\textwidth]{lab-02-screenshots/8.7-rtmp3.png}
-    \caption{Detalle protocolo rtmp durante la transmision.}
-\end{figure}
-
-\begin{itemize}
-    \item \textbf{Handshake C0+C1:} El cliente envía la versión del protocolo (03) 
-    junto con datos de inicialización (timestamp y datos aleatorios).
-    \item \textbf{Handshake S0+S1+S2:} El servidor responde confirmando la versión, 
-    enviando sus propios datos de inicialización y devolviendo los del cliente.
-    \item \textbf{Handshake C2:} El cliente confirma la recepción de los datos del servidor, 
-    completando así el proceso de sincronización.
-    \item \textbf{RTMP Command (AMF0 \_result):} Una vez finalizado el \textit{handshake}, 
-    se intercambian comandos de control en formato AMF0, como la respuesta \_result, 
-    que confirma la correcta conexión y preparación del canal para transmitir audio, 
-    video y datos en tiempo real.
-\end{itemize}
-Ahora bien, veamos como va funcionando el flujo de los paquetes durante la transmision:
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.95\textwidth]{lab-02-screenshots/8.7-conexionGeneral.png}
-    \caption{Detalle protocolo rtmp durante la transmision.}
-\end{figure}
-
-Tras completar el \textbf{handshake} inicial de RTMP, se observa el intercambio de mensajes de configuración entre el cliente (172.20.10.7) y el servidor (172.20.10.11), junto con retransmisiones y confirmaciones de control en la capa TCP.  
-
-\begin{itemize}
-    \item El cliente envía el \textbf{Handshake C0+C1} y el servidor responde con 
-    \textbf{S0+S1+S2}, completando la fase de sincronización.
-    \item Se observan varias retransmisiones TCP y \textbf{ACK duplicados}, lo que indica 
-    pérdida o retraso de paquetes en la comunicación.
-    \item El servidor envía el mensaje \textbf{Window Acknowledgement Size} (5000000), 
-    que define el tamaño máximo de ventana para el control de flujo.
-    \item Posteriormente, el servidor transmite los comandos 
-    \textbf{Set Peer Bandwidth (5000000, Dynamic)} y 
-    \textbf{Set Chunk Size (4096)}, que establecen los parámetros de transmisión.
-    \item Finalmente, se observa el comando \textbf{\_result('NetConnection.Connect.Success')}, 
-    que confirma la conexión exitosa del cliente al servidor RTMP y marca el inicio 
-    de la sesión de transmisión de audio, video y datos.
-\end{itemize}
-
-Por ultimo, veamos como el protocolo \textbf{RTMP} utiliza el protocolo de la capa de transporte \textbf{RTMP} para mantener una conexion estable y confiable con el servidor:
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.95\textwidth]{lab-02-screenshots/8.7-rtmpTCP.png}
-    \caption{Detalle protocolo RTMP usando el TCP.}
-\end{figure}
-\begin{itemize}
-    \item El paquete utiliza la bandera \textbf{PSH, ACK}, indicando que 
-    los datos deben ser entregados de inmediato a la capa superior.
-    \item El payload contiene un mensaje \textbf{Window Acknowledgement Size}, 
-    cuyo valor es \textbf{5,000,000 bytes}.
-    \item Este parámetro establece el límite máximo de datos que pueden ser 
-    enviados antes de requerir una confirmación, permitiendo al servidor 
-    regular el flujo de transmisión hacia el cliente.
-    \item Forma parte de la negociación de parámetros después del 
-    \textbf{handshake RTMP}, y es esencial para el control de congestión 
-    y el rendimiento de la sesión de streaming.
-\end{itemize}
+Con UDP, no se guarda información de conexión, por lo que el uso de memoria es menor. La carga de CPU proviene principalmente de la cantidad de datagramas que se deben procesar por segundo. En general, UDP tiende a ser más liviano y eficiente cuando se manejan muchos clientes.
 
 
-\subsection*{Conclusion final}
+\subsection{Diseño de un sistema real para millones de usuarios}
+Para una aplicación a gran escala, lo más adecuado sería combinar ambos protocolos. 
 
-\begin{itemize}
-    \item \textbf{Información de la capa de aplicación:} Se identificó el uso del protocolo 
-    \textbf{RTMP (Real-Time Messaging Protocol)}, encargado de la transmisión en tiempo real 
-    de audio, video y datos, soportado en mensajes como \textit{Handshake}, 
-    \textit{Window Acknowledgement Size}, \textit{Set Peer Bandwidth} y 
-    \textit{NetConnection.Connect.Success}.
-    
-    \item \textbf{Protocolo de la capa de transporte:} La transmisión hace uso de 
-    \textbf{TCP}, que garantiza una comunicación confiable mediante el 
-    \textit{three-way handshake} (SYN, SYN-ACK, ACK), retransmisiones y confirmaciones.
-    
-    \item \textbf{Puertos utilizados:} El servidor emplea el puerto estándar 
-    \textbf{1935} para RTMP, mientras que el cliente se conecta desde un puerto dinámico, 
-    identificado en la captura como el \textbf{2255}.
-\end{itemize}
+En la comunicación entre publicadores y el \textit{broker}, se puede usar \textbf{TCP o QUIC} para asegurar que los eventos lleguen correctamente. Para distribuir la información a los usuarios finales, podría emplearse \textbf{UDP multicast} o redes de distribución de contenido (CDN) con WebSockets o HTTP/2, que mantienen buena velocidad y escalabilidad.
 
+De esta manera, se logra un equilibrio entre fiabilidad y rendimiento: TCP asegura que la información importante no se pierda, mientras que UDP permite alcanzar una gran cantidad de usuarios con baja latencia. 
 
-
+Hoy en dia es comun que las aplicaciones mas grandes, como los navegadores web o aplicaciones como facebook o X utilizan quic para las funciones para reducir la latencia en sus aplicaciones, y apoyan los procesos utilizando una fuerte logica de la capa de aplicacion.
 
 
 \begin{thebibliography}{9}
