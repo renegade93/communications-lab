@@ -156,7 +156,7 @@ void run_match_simulation(int sock, struct sockaddr_in* addr, int use_udp,
 
         // send via chosen protocol
         if(use_udp)
-            sendto(sock,payload,strlen(payload),0,(struct sockaddr*)addr,alen);
+            send_reliable(payload, strlen(payload)); 
         else
             send(sock,payload,strlen(payload),0);
 

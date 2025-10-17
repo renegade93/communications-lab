@@ -8,7 +8,7 @@
 
 int main(int argc, char* argv[]) {
     if (argc < 4) {
-        fprintf(stderr, "Usage: %s <broker_ip> <broker_port> <topic>\n", argv[0]);
+        fprintf(stderr, "Uso: %s <broker_ip> <puerto> <topic>\n", argv[0]);
         return EXIT_FAILURE;
     }
 
@@ -27,31 +27,29 @@ int main(int argc, char* argv[]) {
     snprintf(sub_msg, sizeof(sub_msg), "SUBSCRIBE|%s\n", topic);
     sendto(sock, sub_msg, strlen(sub_msg), 0,
            (struct sockaddr*)&broker_addr, sizeof(broker_addr));
+    
+    printf("Suscrito a '%s'. Esperando eventos...\n", topic);
 
     RudpPacket packet_in;
-    struct sockaddr_in from_addr;
-    socklen_t from_len = sizeof(from_addr);
     uint32_t last_seq_num_seen = 0;
 
     while (1) {
-        int n = recvfrom(sock, &packet_in, sizeof(packet_in), 0,
-                         (struct sockaddr*)&from_addr, &from_len);
+        int n = recvfrom(sock, &packet_in, sizeof(packet_in), 0, NULL, NULL);
 
+        // Ignorar si no es un paquete de datos válido con la cabecera
         if (n < sizeof(RudpHeader) || packet_in.header.type != PKT_DATA) {
             continue;
         }
 
         uint32_t seq_num = ntohl(packet_in.header.seq_num);
 
-        RudpPacket ack_out;
-        ack_out.header.type = PKT_ACK;
-        ack_out.header.seq_num = htonl(seq_num);
-
-        sendto(sock, &ack_out, sizeof(RudpHeader), 0,
-               (struct sockaddr*)&from_addr, from_len);
-
+        // Si es un paquete nuevo (no un duplicado), lo procesamos
         if (seq_num > last_seq_num_seen) {
-            printf("%s", packet_in.payload);
+            // Buscar el separador '|' para imprimir solo el contenido del evento
+            char* message_content = strchr(packet_in.payload, '|');
+            if (message_content) {
+                printf("%s", message_content + 1);
+            }
             last_seq_num_seen = seq_num;
         }
     }
