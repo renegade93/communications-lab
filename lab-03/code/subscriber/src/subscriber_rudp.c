@@ -8,11 +8,10 @@
 #include <sys/time.h>
 #include <errno.h>
 
-// --- NUEVA FUNCIÓN DE SUSCRIPCIÓN FIABLE ---
 void subscribe_reliable(int sock, const char* topic, struct sockaddr_in* broker_addr) {
     RudpPacket packet_out;
     packet_out.header.type = PKT_SUB;
-    packet_out.header.seq_num = 0; // seq_num no es necesario aquí, pero lo ponemos a 0
+    packet_out.header.seq_num = 0;
     strncpy(packet_out.payload, topic, MAX_PAYLOAD);
 
     RudpPacket packet_in;
@@ -25,10 +24,9 @@ void subscribe_reliable(int sock, const char* topic, struct sockaddr_in* broker_
 
         if (n > 0 && packet_in.header.type == PKT_SUB_ACK) {
             printf("Suscripción confirmada por el broker. Esperando eventos...\n");
-            break; // Éxito, salimos del bucle
+            break;
         } else {
             printf("No se recibió confirmación, reintentando suscripción...\n");
-            // El timeout del socket hará que reintente
         }
     }
 }
@@ -46,7 +44,7 @@ int main(int argc, char* argv[]) {
     int sock = setup_udp_socket(0);
     
     struct timeval tv;
-    tv.tv_sec = 1; // Timeout de 1 segundo para reintentar la suscripción
+    tv.tv_sec = 1;
     tv.tv_usec = 0;
     setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
 
@@ -55,7 +53,6 @@ int main(int argc, char* argv[]) {
     broker_addr.sin_port = htons(broker_port);
     inet_pton(AF_INET, broker_ip, &broker_addr.sin_addr);
 
-    // Llamamos a la nueva función de suscripción fiable
     subscribe_reliable(sock, topic, &broker_addr);
 
     RudpPacket packet_in;
