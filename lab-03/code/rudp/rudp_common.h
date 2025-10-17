@@ -3,13 +3,15 @@
 
 #include <stdint.h>
 
-#define RUDP_PORT 1234
-#define RUDP_TIMEOUT_MS 500
+#define RUDP_TIMEOUT_MS 1000
 #define MAX_PAYLOAD 1024
 
+// --- NUEVOS FLAGS AÑADIDOS ---
 typedef enum {
-    PKT_DATA,
-    PKT_ACK
+    PKT_DATA,       // De Publisher a Broker
+    PKT_ACK,        // De Broker a Publisher
+    PKT_SUB,        // De Subscriber a Broker (¡NUEVO!)
+    PKT_SUB_ACK     // De Broker a Subscriber (¡NUEVO!)
 } PacketType;
 
 typedef struct {
