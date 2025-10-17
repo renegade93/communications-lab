@@ -8,7 +8,7 @@
 
 // ---- Common helpers ----
 int connect_tcp(const char *ip, int port);
-int setup_udp_socket(void);  
+int setup_udp_socket(int port);  
 void send_subscription_tcp(int sock, const char *topic);
 void send_subscription_udp(int sock, const char *topic,
                            struct sockaddr_in *broker_addr);

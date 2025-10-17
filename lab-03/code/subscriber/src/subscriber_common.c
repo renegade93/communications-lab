@@ -31,7 +31,7 @@ int connect_tcp(const char *ip, int port) {
 }
 
 // --- UDP setup (always random port) ---
-int setup_udp_socket(void) {
+int setup_udp_socket(int port) {
     int sock = socket(AF_INET, SOCK_DGRAM, 0);
     if (sock < 0) { perror("socket"); exit(EXIT_FAILURE); }
 
