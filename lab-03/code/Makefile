@@ -18,13 +18,13 @@ TARGET_SUB = subscriber_rudp
 all: $(TARGET_BROKER) $(TARGET_PUB) $(TARGET_SUB)
 
 $(TARGET_BROKER): $(BROKER_C)
-    $(CC) $(CFLAGS) $^ -o $@
+	$(CC) $(CFLAGS) $^ -o $@
 
 $(TARGET_PUB): $(PUBLISHER_C)
-    $(CC) $(CFLAGS) $^ -o $@
+	$(CC) $(CFLAGS) $^ -o $@
 
 $(TARGET_SUB): $(SUBSCRIBER_C)
-    $(CC) $(CFLAGS) $^ -o $@
+	$(CC) $(CFLAGS) $^ -o $@
 
 clean:
-    rm -f $(TARGET_BROKER) $(TARGET_PUB) $(TARGET_SUB)
+	rm -f $(TARGET_BROKER) $(TARGET_PUB) $(TARGET_SUB)
