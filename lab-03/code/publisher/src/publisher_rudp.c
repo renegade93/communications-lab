@@ -8,12 +8,13 @@
 #include <sys/time.h>
 #include <time.h>
 #include <errno.h>
+#include <ctype.h>
 
+// --- Variables y funciones de envío R-UDP ---
 static int sock;
 static struct sockaddr_in broker_addr;
 static uint32_t current_seq_num = 1;
 
-// Función de envío fiable (sin cambios)
 void send_reliable(const char* data, size_t len) {
     RudpPacket packet_out;
     packet_out.header.type = PKT_DATA;
@@ -33,17 +34,11 @@ void send_reliable(const char* data, size_t len) {
                          (struct sockaddr*)&from_addr, &from_len);
 
         if (n < 0) {
-            if (errno == EAGAIN || errno == EWOULDBLOCK) {
-                // Timeout, el bucle continuará y retransmitirá
-                continue;
-            } else {
-                perror("recvfrom");
-                break;
-            }
+            if (errno == EAGAIN || errno == EWOULDBLOCK) continue;
+            else { perror("recvfrom"); break; }
         }
 
-        if (n >= sizeof(RudpHeader) &&
-            packet_in.header.type == PKT_ACK &&
+        if (n >= sizeof(RudpHeader) && packet_in.header.type == PKT_ACK &&
             ntohl(packet_in.header.seq_num) == current_seq_num) {
             current_seq_num++;
             break;
@@ -51,10 +46,58 @@ void send_reliable(const char* data, size_t len) {
     }
 }
 
-// Lógica de simulación completa, adaptada para usar nuestro envío fiable
+// --- Funciones de ayuda para la simulación (copiadas de publisher_common.c) ---
+static int rand_in(int lo, int hi) { return lo + rand() % (hi - lo + 1); }
+
+static int pick_active(const TeamState* T){
+    int pool[MAX_PLAYERS], m=0;
+    for(int i=0;i<T->n_st+T->n_bn;i++)
+        if(T->on_field[i] && !T->sent_off[i]) pool[m++]=i;
+    return (m? pool[rand_in(0,m-1)] : -1);
+}
+static int pick_two_active(const TeamState* T,int* a,int* b){
+    int pool[MAX_PLAYERS], m=0;
+    for(int i=0;i<T->n_st+T->n_bn;i++)
+        if(T->on_field[i] && !T->sent_off[i]) pool[m++]=i;
+    if(m<2) return -1;
+    *a = pool[rand_in(0,m-1)];
+    do { *b = pool[rand_in(0,m-1)]; } while(*b==*a);
+    return 0;
+}
+static int pick_out_starter(const TeamState* T){
+    int pool[STARTERS], m=0;
+    for(int i=0;i<T->n_st;i++) if(T->on_field[i] && !T->sent_off[i]) pool[m++]=i;
+    return (m? pool[rand_in(0,m-1)] : -1);
+}
+static int pick_in_bench(TeamState* T){
+    int pool[BENCH], m=0;
+    for(int j=0;j<T->n_bn;j++)
+        if(!T->bench_used[j] && !T->sent_off[STARTERS+j] && !T->on_field[STARTERS+j]) pool[m++]=j;
+    if(!m) return -1;
+    int bj = pool[rand_in(0,m-1)];
+    T->bench_used[bj]=1;
+    return STARTERS + bj;
+}
+static void apply_card(TeamState* T,int idx,int minute,char* out,size_t outsz){
+    int direct_red = (rand_in(1,100) <= 20);
+    if(direct_red){
+        T->sent_off[idx]=1; T->on_field[idx]=0;
+        snprintf(out,outsz,"[RED] Direct red card for %s at %d (Player expelled)\n", T->name[idx], minute);
+        return;
+    }
+    if(T->yellows[idx]==0){
+        T->yellows[idx]=1;
+        snprintf(out,outsz,"[CARD] Yellow card for %s at %d'\n", T->name[idx], minute);
+    }else{
+        T->sent_off[idx]=1; T->on_field[idx]=0;
+        snprintf(out,outsz,"[RED] Second yellow for %s at %d' (Player expelled)\n", T->name[idx], minute);
+    }
+}
+
+
+// --- Simulación con LÓGICA COMPLETA Y ALEATORIA ---
 void run_full_simulation(const char* topic, const char* teamA, const char* teamB)
 {
-    // Esta función es una adaptación de la original en 'publisher_common.c'
     srand(time(NULL));
     TeamRoster rA = get_team(teamA), rB = get_team(teamB);
     TeamState A, B;
@@ -62,74 +105,6 @@ void run_full_simulation(const char* topic, const char* teamA, const char* teamB
     build_team_state(&B, rB);
     int scoreA = 0, scoreB = 0;
 
-    int mins[EVENTS_PER_MATCH] = {rand() % 7 + 1, rand() % 7 + 8, rand() % 7 + 15, rand() % 7 + 22,
-                                  rand() % 7 + 29, rand() % 7 + 36, 45, rand() % 7 + 50, rand() % 7 + 57,
-                                  rand() % 7 + 64, rand() % 7 + 71, 90};
-    for (int i = 1; i < EVENTS_PER_MATCH; i++) {
-        if (mins[i] <= mins[i - 1]) mins[i] = mins[i - 1] + 1;
-        if (mins[i] > 90) mins[i] = 90;
-    }
-
-    for (int i = 0; i < EVENTS_PER_MATCH; i++) {
-        char payload[MAX_LINE];
-        char message_content[MAX_LINE];
-
-        // Lógica de generación de eventos (copiada de publisher_common.c)
-        if (mins[i] == 45) {
-             snprintf(message_content, sizeof(message_content), "[HT] 45' Halftime — %s %d-%d %s\n", teamA, scoreA, scoreB, teamB);
-        } else if (mins[i] == 90) {
-             snprintf(message_content, sizeof(message_content), "[FT] 90' Full time — %s %d-%d %s\n", teamA, scoreA, scoreB, teamB);
-        } else {
-            // Lógica simplificada para el ejemplo. La original es más compleja.
-             snprintf(message_content, sizeof(message_content), "[INFO] Evento en el minuto %d'\n", mins[i]);
-        }
-        
-        // Creamos el payload final: "topic|mensaje"
-        snprintf(payload, sizeof(payload), "%s|%s", topic, message_content);
-
-        // ¡Imprimimos el mensaje antes de enviarlo!
-        printf("Sent: %s", message_content);
-        
-        // Usamos nuestra función de envío fiable
-        send_reliable(payload, strlen(payload));
-
-        sleep(1);
-    }
-}
-
-int main(int argc, char* argv[]) {
-    if (argc < 4) {
-        fprintf(stderr, "Usage: %s <broker_ip> <port> <topic>\n", argv[0]);
-        return EXIT_FAILURE;
-    }
-
-    const char* broker_ip = argv[1];
-    int port = atoi(argv[2]);
-    const char* topic = argv[3];
-
-    sock = socket(AF_INET, SOCK_DGRAM, 0);
-
-    // Timeout de 1 segundo para el socket
-    struct timeval tv;
-    tv.tv_sec = 1;
-    tv.tv_usec = 0;
-    setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv));
-
-    broker_addr = (struct sockaddr_in){0};
-    broker_addr.sin_family = AF_INET;
-    broker_addr.sin_port = htons(port);
-    inet_pton(AF_INET, broker_ip, &broker_addr.sin_addr);
-
-    // Obtenemos los nombres de los equipos a partir del topic
-    char teamA[64], teamB[64];
-    parse_teams(topic, teamA, teamB);
-
-    printf("Iniciando simulación para %s vs %s...\n", teamA, teamB);
-
-    // Ejecutamos la simulación completa
-    run_full_simulation(topic, teamA, teamB);
-
-    close(sock);
-    printf("Simulación completada.\n");
-    return 0;
-}
+    int mins[EVENTS_PER_MATCH] = {rand_in(1, 7), rand_in(8, 14), rand_in(15, 21), rand_in(22, 28),
+                                  rand_in(29, 35), rand_in(36, 42), 45, rand_in(50, 56), rand_in(57, 63),
+                                  rand_in(64, 70
