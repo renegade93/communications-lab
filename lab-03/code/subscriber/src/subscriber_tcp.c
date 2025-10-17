@@ -36,8 +36,14 @@ int main(int argc, char *argv[]) {
             break;
         }
         buffer[n] = '\0';
-        printf("%s", buffer);
-        fflush(stdout);
+        
+         // --- NEW: ensure clean line break ---
+        if (buffer[n - 1] != '\n') {
+            printf("%s\n", buffer);
+        } else {
+            printf("%s", buffer);
+        }
+            fflush(stdout);
     }
 
     close(sock);

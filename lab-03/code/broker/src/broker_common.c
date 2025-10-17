@@ -7,7 +7,7 @@
 Topic topics[MAX_TOPICS];
 int num_topics = 0;
 
-// --- Utility ---
+// Utility
 int same_addr(struct sockaddr_in *a, struct sockaddr_in *b) {
     return (a->sin_addr.s_addr == b->sin_addr.s_addr &&
             a->sin_port == b->sin_port);
@@ -21,7 +21,7 @@ int find_topic(const char *name) {
     return -1;
 }
 
-// --- Add subscriber (TCP) ---
+// Add subscriber (TCP)
 int register_subscription_tcp(const char *topic, int fd) {
     int idx = find_topic(topic);
     if (idx == -1) {
@@ -49,7 +49,7 @@ int register_subscription_tcp(const char *topic, int fd) {
             if (topics[i].subs_tcp[j] == fd)
                 total++;
 
-    printf("[Broker-TCP] Client %d subscribed to '%s' (Topic #%d, %d total subs, now follows %d topics)\n",
+    printf("[Broker-TCP] Client %d subscribed to '%s' (Topic #%d, %d total subs, Client now follows %d topics)\n",
            fd, topic, idx, topics[idx].num_subs_tcp, total);
 
     return idx;
