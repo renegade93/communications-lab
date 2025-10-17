@@ -6,6 +6,28 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 
+// --- NUEVA FUNCIÓN DE REENVÍO ---
+// Esta función SÍ sabe cómo reenviar nuestros RudpPackets
+// porque usa un tamaño explícito en lugar de strlen.
+void broker_forward_reliable_packet(int sock, const char* topic, RudpPacket* packet, int packet_size) {
+    int idx = find_topic(topic);
+    if (idx == -1 || topics[idx].num_subs_udp == 0) return;
+
+    for (int i = 0; i < topics[idx].num_subs_udp; i++) {
+        struct sockaddr_in* dest = &topics[idx].subs_udp[i];
+        
+        // Enviamos el paquete usando el tamaño 'packet_size' que recibimos
+        if (sendto(sock, packet, packet_size, 0, 
+                   (struct sockaddr*)dest, sizeof(*dest)) < 0) {
+            perror("sendto (forward)");
+        }
+    }
+    
+    printf("[Broker] Reenviado paquete a %d suscriptor(es) para '%s'\n", 
+           topics[idx].num_subs_udp, topic);
+}
+
+
 int main(int argc, char* argv[]) {
     if (argc != 2) {
         fprintf(stderr, "Uso: %s <puerto>\n", argv[0]);
@@ -28,15 +50,16 @@ int main(int argc, char* argv[]) {
     uint32_t last_pub_seq_num = 0;
 
     while (1) {
+        // 'n' es el número de bytes REALES que se recibieron
         int n = recvfrom(sock, &packet_in, sizeof(packet_in), 0,
                          (struct sockaddr*)&from_addr, &from_len);
         if (n <= 0) continue;
 
-        // --- LÓGICA DE PAQUETES MEJORADA ---
         if (n >= sizeof(RudpHeader)) {
             switch(packet_in.header.type) {
                 case PKT_DATA: {
                     uint32_t seq_num = ntohl(packet_in.header.seq_num);
+                    // Enviar ACK al Publisher
                     RudpPacket ack_out;
                     ack_out.header.type = PKT_ACK;
                     ack_out.header.seq_num = htonl(seq_num);
@@ -49,7 +72,11 @@ int main(int argc, char* argv[]) {
                             char topic[MAX_TOPIC_LEN];
                             strncpy(topic, packet_in.payload, sep - packet_in.payload);
                             topic[sep - packet_in.payload] = '\0';
-                            broker_forward_message_udp(sock, topic, (const char*)&packet_in);
+                            
+                            // --- LLAMADA CORREGIDA ---
+                            // Llamamos a nuestra NUEVA función de reenvío
+                            // y le pasamos el paquete y su tamaño exacto 'n'
+                            broker_forward_reliable_packet(sock, topic, &packet_in, n);
                         }
                     }
                     break;
@@ -58,6 +85,7 @@ int main(int argc, char* argv[]) {
                     char* topic = packet_in.payload;
                     register_subscription_udp(topic, &from_addr);
                     
+                    // Enviar SUB_ACK al Subscriber
                     RudpPacket sub_ack_out;
                     sub_ack_out.header.type = PKT_SUB_ACK;
                     sub_ack_out.header.seq_num = 0;
@@ -65,7 +93,6 @@ int main(int argc, char* argv[]) {
                     break;
                 }
                 default:
-                    // Ignorar otros tipos de paquetes
                     break;
             }
         }
