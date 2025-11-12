@@ -22,7 +22,6 @@
 \usepackage{tcolorbox}
 \tcbuselibrary{listings}
 
-
 % code
 \usepackage{listings}
 \usepackage{xcolor}
@@ -130,8 +129,7 @@
     \map{
       \step[fieldsource=note, final]
       \step[fieldset=addendum, origfieldval, final]
-      \step[fieldset=note, null]}
-      }
+      \step[fieldset=note, null]}}
 }
 
 \DefineBibliographyStrings{english}{urlseen = {Accessed }    
@@ -162,7 +160,7 @@
 \includegraphics[width=100pt]{images/logo.png} 
 
 \vspace{35pt}
-{\LARGE \bfseries Laboratorio \#3: Protocolo de enrutamiento dinamicos con redes IPv4 e IPv6}
+{\LARGE \bfseries Laboratorio \#4: Protocolo de enrutamiento dinámicos con redes IPv4 e IPv6}
 \vspace{55pt}
 
 {\Large \bfseries ISIS3204 - Infraestructura de Comunicaciones}
@@ -185,7 +183,6 @@
 
 \begin{center}
 \vspace{60pt}
-
 \Large\bfseries 2025-10
 \end{center}
 
@@ -197,29 +194,32 @@
 \tableofcontents
 \clearpage
 
-
 \renewcommand{\thesection}{\arabic{section}}
 \section*{Introducción}
 \addcontentsline{toc}{section}{Introducción}
 
+El presente laboratorio tiene como objetivo principal \textbf{comprender y aplicar los protocolos de enrutamiento dinámico RIP y OSPF en entornos IPv4 e IPv6}, destacando sus diferencias estructurales y operativas. A través de la configuración práctica de routers Cisco en el simulador \textit{Cisco Packet Tracer}, se busca afianzar los conceptos teóricos sobre el funcionamiento de los protocolos de vector distancia y de estado de enlace, así como el proceso de intercambio de información de enrutamiento y la construcción de tablas de rutas en topologías multi-router.
 
+Durante el desarrollo de la práctica se implementan diferentes escenarios de red que integran el direccionamiento IP, la configuración de interfaces, y la activación de protocolos de enrutamiento dinámico. Esto permite observar cómo los routers actualizan sus tablas de enrutamiento de manera automática y cómo se comporta la red ante variaciones en la topología o fallos en los enlaces.
 
+El laboratorio permite al estudiante:
+\begin{itemize}
+    \item Diferenciar los principios de funcionamiento de \textbf{RIP (Routing Information Protocol)} y \textbf{OSPF (Open Shortest Path First)}, tanto en su versión IPv4 como IPv6.
+    \item Configurar y verificar el intercambio de rutas dinámicas entre múltiples routers, observando métricas como el conteo de saltos y el costo por ancho de banda.
+    \item Comprender el proceso de \textbf{asignación jerárquica de direcciones IP}, el uso de máscaras de subred y prefijos en IPv6, así como la importancia del direccionamiento correcto en la conectividad de red.
+    \item Analizar el impacto de los protocolos de enrutamiento en la convergencia de la red y en la eficiencia del encaminamiento de paquetes.
+\end{itemize}
+
+De esta forma, la práctica integra los conceptos fundamentales del \textbf{nivel de red del modelo OSI}, brindando una experiencia completa que abarca el diseño, configuración y validación de una infraestructura de comunicación moderna y funcional.
 
 %==============================================================
 %=======================   1   ================================
 %==============================================================
 \section{Modelo Publicador–Suscriptor}
 
-
-
-
 \begin{thebibliography}{9}
-
-
   \bibitem{kurose_ross}
   Computer Networking, a top-down approach. James Kurose, Keith Ross. Addison-Wesley, 6th ed.
-
-  \end{thebibliography}
-
+\end{thebibliography}
 
 \end{document}
