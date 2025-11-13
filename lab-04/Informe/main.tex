@@ -202,7 +202,7 @@ El presente laboratorio tiene como objetivo principal \textbf{comprender y aplic
 
 Durante el desarrollo de la práctica se implementan diferentes escenarios de red que integran el direccionamiento IP, la configuración de interfaces, y la activación de protocolos de enrutamiento dinámico. Esto permite observar cómo los routers actualizan sus tablas de enrutamiento de manera automática y cómo se comporta la red ante variaciones en la topología o fallos en los enlaces.
 
-El laboratorio permite al estudiante:
+El laboratorio permite:
 \begin{itemize}
     \item Diferenciar los principios de funcionamiento de \textbf{RIP (Routing Information Protocol)} y \textbf{OSPF (Open Shortest Path First)}, tanto en su versión IPv4 como IPv6.
     \item Configurar y verificar el intercambio de rutas dinámicas entre múltiples routers, observando métricas como el conteo de saltos y el costo por ancho de banda.
@@ -213,10 +213,49 @@ El laboratorio permite al estudiante:
 De esta forma, la práctica integra los conceptos fundamentales del \textbf{nivel de red del modelo OSI}, brindando una experiencia completa que abarca el diseño, configuración y validación de una infraestructura de comunicación moderna y funcional.
 
 %==============================================================
-%=======================   1   ================================
+%=======================   BGP   ==============================
 %==============================================================
-\section{Modelo Publicador–Suscriptor}
+\section{Protocolo BGP (Border Gateway Protocol)}
 
+El \textbf{Border Gateway Protocol (BGP)} es un protocolo de enrutamiento exterior (EGP) utilizado para el intercambio de información de enrutamiento entre sistemas autónomos (AS). A diferencia de los protocolos de gateway interior (IGP) como RIP u OSPF, que se utilizan dentro de un dominio administrativo, BGP opera entre dominios, tomando decisiones de enrutamiento basadas en políticas y reglas definidas por el administrador de red más que en métricas técnicas.
+
+En este laboratorio, se implementó una topología de tres routers interconectados, donde se configuró BGP entre los sistemas autónomos definidos para permitir la conectividad entre redes IPv4 de diferentes dominios. Posteriormente, se realizaron pruebas de conectividad mediante mensajes ICMP (\textit{ping}) para validar el intercambio de rutas entre routers.
+
+\subsection{Pruebas de Conectividad}
+
+Para la verificación del correcto funcionamiento de BGP, se capturaron paquetes ICMP entre las redes 192.168.10.0/24, 192.168.50.0/24 y 192.168.60.0/24. En los siguientes análisis de Wireshark se observan las solicitudes y respuestas de \textit{Echo (ping)} entre las distintas interfaces de los routers.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/BGP_S1_G3.png}
+    \caption{Tráfico ICMP entre las redes 192.168.10.4 y 192.168.60.4 (primer intercambio de pings).}
+\end{figure}
+
+En la captura anterior se aprecia el envío y la respuesta de paquetes ICMP entre los nodos de las subredes 192.168.10.0 y 192.168.60.0, evidenciando la correcta propagación de rutas mediante BGP. Cada solicitud (request) tiene su respectiva respuesta (reply), con un \textit{Time To Live (TTL)} inicial de 126 para el envío y de 128 para la respuesta, lo que confirma el reenvío exitoso a través de múltiples saltos.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/BGP_S1_G3_2.png}
+    \caption{Intercambio de paquetes ICMP entre 192.168.10.4 y 192.168.60.4 durante pruebas extendidas.}
+\end{figure}
+
+En esta segunda captura se verifica que el intercambio de mensajes ICMP continúa estable en ambas direcciones. El identificador (\texttt{id=0x0001}) y el número de secuencia (\texttt{seq}) incrementan de forma correcta, mostrando la continuidad del flujo de datos entre las redes asociadas a los diferentes routers configurados bajo BGP.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/BGP_S1_G3_3.png}
+    \caption{Comunicación ICMP entre las redes 192.168.10.4 y 192.168.50.4 (enlace verificado).}
+\end{figure}
+
+Finalmente, en la tercera captura se observa el intercambio exitoso de paquetes entre las redes 192.168.10.0 y 192.168.50.0. El correcto establecimiento de las sesiones BGP permitió el anuncio y la propagación de rutas entre los sistemas autónomos, garantizando la conectividad total entre los extremos.
+
+\subsection{Conclusión del BGP}
+
+Los resultados de las pruebas confirman que el protocolo BGP se configuró correctamente, permitiendo la propagación de rutas entre diferentes sistemas autónomos y asegurando la conectividad completa entre las subredes. Las capturas en Wireshark demuestran que los routers establecieron correctamente las sesiones BGP y que los paquetes ICMP alcanzan los destinos remotos, evidenciando la convergencia exitosa del protocolo y la efectividad del enrutamiento exterior.
+
+%==============================================================
+%=======================   BIBLIOGRAFÍA   =====================
+%==============================================================
 \begin{thebibliography}{9}
   \bibitem{kurose_ross}
   Computer Networking, a top-down approach. James Kurose, Keith Ross. Addison-Wesley, 6th ed.
