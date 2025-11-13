@@ -213,6 +213,36 @@ El laboratorio permite:
 
 De esta forma, la práctica integra los conceptos fundamentales del \textbf{nivel de red del modelo OSI}, brindando una experiencia completa que abarca el diseño, configuración y validación de una infraestructura de comunicación moderna y funcional.
 %==============================================================
+%=======================   Mapas cada topologia ==============================
+%==============================================================
+\section{Mapas de cada topología}
+\subsubsection*{Topología \#1 - RIPv1 y OSPF (IPv4)}
+Esta topología conecta tres routers (R1, R2 y R3) y dos PCs ubicadas en redes finales independientes. Se utilizan las redes \textbf{192.168.10.0}, \textbf{192.168.20.0}, \textbf{192.168.30.0} y \textbf{192.168.40.0}, junto con interfaces loopback anunciadas mediante enrutamiento dinámico. El objetivo es configurar y comprobar el funcionamiento de RIPv1 y OSPF, permitiendo que las estaciones finales intercambien tráfico a través de rutas aprendidas automáticamente.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/topology-1.jpg}
+    \caption{Topología \#1}
+\end{figure}
+
+\subsubsection*{Topología \#2 - BGP (IPv4)}
+En esta topología los routers R7, R8 y R9 conforman una estructura tipo “Y” que simula diferentes sistemas autónomos interconectados. Cada router anuncia redes propias como \textbf{192.168.10.0}, \textbf{192.168.40.0}, \textbf{192.168.50.0} y \textbf{192.168.60.0}, y cada subred final contiene una PC. Su propósito es implementar BGP para el intercambio de prefijos entre los routers y validar la comunicación extremo a extremo mediante rutas basadas en políticas.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=405pt]{images/topology-2.jpg}
+    \caption{Topología \#2}
+\end{figure}
+
+
+
+\subsubsection*{Topología \#3 - RIPng y OSPFv3 (IPv6)}
+La tercera topología conecta tres routers (R4, R5 y R6) mediante enlaces IPv6 con prefijos /64, junto con dos PCs en redes finales independientes. Utiliza los bloques \textbf{2001:ABCD:1435::/64} y \textbf{2002:ABCD:1435::/64} según lo definido por el laboratorio. Aquí se configuran RIPng y OSPFv3 para observar la distribución dinámica de rutas IPv6 y validar la conectividad entre los equipos.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/topology-3.jpg}
+    \caption{Topología \#3}
+\end{figure}
+%==============================================================
 %=======================   RIPv1   ==============================
 %==============================================================
 \section{Protocolo RIP (Routing Information Protocol)}
@@ -272,36 +302,84 @@ Cada paquete ICMP de tipo 8 (solicitud de eco) enviado desde el equipo origen re
 El tiempo de respuesta entre cada solicitud y su respectiva respuesta es aproximadamente de \textbf{0.021 milisegundos}, lo cual es un valor bajo y característico de una red local (LAN) bien configurada. Este tiempo refleja que la comunicación entre ambos extremos es eficiente y que no hay retardos significativos durante el tránsito de los paquetes a través de los routers.
 
 Adicionalmente, el valor del campo \textit{TTL (Time To Live)} en los mensajes capturados permite inferir que existe al menos un salto intermedio entre los dos equipos, lo que concuerda con la topología establecida y confirma que los routers están realizando el reenvío de paquetes correctamente. De igual forma, se identifican las direcciones físicas de origen y destino (\texttt{08:bf:b8:e2:7c:df} y \texttt{d4:6d:50:94:cb:72}), correspondientes a los dispositivos involucrados en la comunicación.
+%==============================================================
+%=======================   OSPF==============================
+%==============================================================
 
 
+\section{Protocolo OSPF (Open Shortest Path First)}
+El protocolo \textbf{OSPF} (Open Shortest Path First) es un protocolo de enrutamiento de estado de enlace (\textit{Link-State}) que opera en la Capa 3 del modelo OSI. Utiliza el algoritmo de Dijkstra para calcular el camino más corto hacia todas las redes. A diferencia de RIP, OSPF es altamente escalable y adecuado para \textbf{redes medianas y grandes}, ya que no tiene limitación de saltos y maneja la jerarquía de red mediante el concepto de \textbf{Áreas}, lo que facilita una convergencia rápida y previene bucles de enrutamiento.
 
-\section{Mapas de cada topología}
-\subsubsection*{Topología \#1 - RIPv1 y OSPF (IPv4)}
-Esta topología conecta tres routers (R1, R2 y R3) y dos PCs ubicadas en redes finales independientes. Se utilizan las redes \textbf{192.168.10.0}, \textbf{192.168.20.0}, \textbf{192.168.30.0} y \textbf{192.168.40.0}, junto con interfaces loopback anunciadas mediante enrutamiento dinámico. El objetivo es configurar y comprobar el funcionamiento de RIPv1 y OSPF, permitiendo que las estaciones finales intercambien tráfico a través de rutas aprendidas automáticamente.
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{images/topology-1.jpg}
-    \caption{Topología \#1}
-\end{figure}
-
-\subsubsection*{Topología \#2 - BGP (IPv4)}
-En esta topología los routers R7, R8 y R9 conforman una estructura tipo “Y” que simula diferentes sistemas autónomos interconectados. Cada router anuncia redes propias como \textbf{192.168.10.0}, \textbf{192.168.40.0}, \textbf{192.168.50.0} y \textbf{192.168.60.0}, y cada subred final contiene una PC. Su propósito es implementar BGP para el intercambio de prefijos entre los routers y validar la comunicación extremo a extremo mediante rutas basadas en políticas.
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=405pt]{images/topology-2.jpg}
-    \caption{Topología \#2}
-\end{figure}
-
-
-
-\subsubsection*{Topología \#3 - RIPng y OSPFv3 (IPv6)}
-La tercera topología conecta tres routers (R4, R5 y R6) mediante enlaces IPv6 con prefijos /64, junto con dos PCs en redes finales independientes. Utiliza los bloques \textbf{2001:ABCD:1435::/64} y \textbf{2002:ABCD:1435::/64} según lo definido por el laboratorio. Aquí se configuran RIPng y OSPFv3 para observar la distribución dinámica de rutas IPv6 y validar la conectividad entre los equipos.
+\subsection{Análisis del protocolo de enrutamiento}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{images/topology-3.jpg}
-    \caption{Topología \#3}
+    \includegraphics[width=0.7\textwidth]{images/topology-1.jpg}
+    \caption{Mapa topología de referencia (asumida para el análisis).}
 \end{figure}
+
+Para el análisis de OSPF, nos centraremos en los paquetes de mantenimiento y descubrimiento de vecinos, específicamente los paquetes \textbf{Hello}. Las capturas de los paquetes a continuación corresponden al tráfico de OSPF en la red, presumiblemente capturado desde un \textit{PC-2} o dispositivo en un segmento.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/OSPF-general.png}
+    \caption{Capturas del protocolo OSPF: Paquetes Hello.}
+\end{figure}
+
+En estas capturas generales, identificamos varias características clave del protocolo OSPF:
+
+\begin{itemize}
+    \item \textbf{Protocolo de Transporte:} OSPF se ejecuta directamente sobre el Protocolo de Internet (\textit{IP}) utilizando el \textit{Protocolo 89}, sin depender de TCP o UDP.
+    \item \textbf{Dirección de Destino:} Se utiliza la dirección de \textbf{multicast} \texttt{224.0.0.5} (AllSPFRouters) para los mensajes Hello dentro del segmento, lo cual es característico de las comunicaciones OSPF en redes \textit{multi-access} (como Ethernet).
+    \item \textbf{Tipo de Mensaje:} \texttt{Hello Packet (1)}, esencial para descubrir vecinos, establecer adyacencias y mantener la conectividad.
+\end{itemize}
+
+El análisis detallado de uno de los paquetes Hello revela los parámetros de temporización y la función del router en el segmento.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/OSPF-rutas.png}
+    \caption{Detalle del Paquete OSPF Hello.}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\caption{Parámetros clave del OSPF Hello Packet}
+\label{tab:ospf-hello}
+\begin{tabular}{lcl}
+\hline
+\textbf{Campo} & \textbf{Valor} & \textbf{Función} \\ \hline
+Source OSPF Router & 172.16.1.3 & Identificador único del router de origen. \\
+Area ID & 0.0.0.0 (Backbone) & Perteneciente al Área Principal de la red. \\
+Hello Interval [sec] & 10 & Frecuencia de envío de mensajes Hello. \\
+Router Dead Interval [sec] & 40 & Tiempo de espera antes de declarar un vecino como caído. \\
+Designated Router (DR) & 192.168.30.1 & Router principal elegido para el segmento. \\
+Backup Designated Router (BDR) & 0.0.0.0 & Router de respaldo (puede estar en proceso de elección). \\ \hline
+\end{tabular}
+\end{table}
+
+Como se observa, los valores de \textit{Hello Interval} (10s) y \textit{Router Dead Interval} (40s) confirman el funcionamiento estándar de OSPF para mantener la adyacencia. La presencia de un Designated Router (\texttt{192.168.30.1}) y la dirección de multicast son una clara evidencia de un segmento de red \textit{Broadcast} donde es necesaria la elección de DR/BDR para optimizar el intercambio de información de estado de enlace.
+
+\subsection{Prueba de conectividad}
+
+A continuación, verificamos la operación exitosa del enrutamiento OSPF mediante la prueba de conectividad \textit{ping} utilizando el protocolo \textbf{ICMP} (Internet Control Message Protocol).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/OSPF-icmp.png}
+    \caption{Prueba de conectividad protocolo OSPF (paquetes ICMP).}
+\end{figure}
+
+La captura muestra el intercambio de mensajes \textbf{ICMP} entre dos dispositivos. Los mensajes de \textit{Echo Request} (Tipo 8) enviados desde el origen son respondidos por mensajes de \textit{Echo Reply} (Tipo 0) por el destino.
+
+\begin{itemize}
+    \item \textbf{Intercambio Exitoso:} El flujo continuo de solicitudes y respuestas de eco demuestra que la ruta calculada por OSPF es funcional y permite el tránsito de paquetes entre los \textit{hosts}.
+    \item \textbf{Direcciones Involucradas:} Se observa que el ping se realiza desde un dispositivo (probablemente un PC) hacia sí mismo o hacia otro dispositivo en la misma subred (\texttt{192.168.30.31}), lo que confirma la conectividad en el segmento local.
+    \item \textbf{Checksum Correcto:} El valor del \textit{Checksum} en los paquetes ICMP se reporta como correcto, garantizando la integridad de los datos transmitidos.
+    \item \textbf{TTL (Time To Live):} El valor de \textit{TTL} de \texttt{128} en ambos el \textit{Request} y el \textit{Reply} sugiere que, en esta captura específica, el tráfico puede ser local o pasar por muy pocos saltos, pero en el contexto de una red OSPF, la ausencia de pérdida de paquetes confirma que los routers están utilizando las rutas OSPF para reenviar el tráfico correctamente.
+\end{itemize}
+
+En resumen, la operación de OSPF es robusta, con parámetros de temporización correctos y un enrutamiento que garantiza la conectividad completa entre los dispositivos de la red.
 %==============================================================
 %=======================   BGP   ==============================
 %==============================================================
@@ -342,6 +420,194 @@ Finalmente, en la tercera captura se observa el intercambio exitoso de paquetes 
 \subsection{Conclusión del BGP}
 
 Los resultados de las pruebas confirman que el protocolo BGP se configuró correctamente, permitiendo la propagación de rutas entre diferentes sistemas autónomos y asegurando la conectividad completa entre las subredes. Las capturas en Wireshark demuestran que los routers establecieron correctamente las sesiones BGP y que los paquetes ICMP alcanzan los destinos remotos, evidenciando la convergencia exitosa del protocolo y la efectividad del enrutamiento exterior.
+
+%==============================================================
+%=======================   RIPng   ==============================
+%==============================================================
+
+\section{Protocolo RIPng (Routing Information Protocol next generation)}
+El protocolo \textbf{RIPng} (Routing Information Protocol next generation) es la evolución del protocolo RIP para su uso en redes \textbf{IPv6}. Al igual que su predecesor, es un protocolo de enrutamiento dinámico que utiliza el algoritmo Bellman-Ford para encontrar el camino con menor cantidad de saltos, operando bajo el paradigma de vector-distancia. Vale la pena mencionar que este protocolo mantiene el límite de 15 saltos; al pasar de 15 saltos (métrica 16), la red se considerará inalcanzable, por lo que \textbf{RIPng} también se utiliza para redes pequeñas.
+
+\subsection{Analisis del protocolo de enrutamiento}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/topology-3.jpg}
+    \caption{Mapa topologia numero 3.}
+\end{figure}
+
+Para empezar, usaremos la topologia 3, donde, como se ve en la imagen, tendremos 3 routers (numero de saltos menor a 15), y las capturas de los paquetes que veremos a continuacion corresponderan a las capturas en la red. A continuacion vemos los paquetes capturados con el protocolo \textbf{RIPng}.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/RIPng-general.png}
+    \caption{Capturas del protocolo RIPng.}
+    \label{fig:RIPng-general} % Añadida etiqueta para referencia
+\end{figure}
+
+En esta captura podemos ver varias caracteristicas importantes del protocolo \textbf{RIPng}, una de ellas es el uso del protocolo de la capa de transporte \textit{UDP} con el puerto \textbf{521} (a diferencia del puerto 520 de RIPv1 y v2). Tambien, podemos ver el uso de la direccion de destino \textit{ff02::9}, mostrando que en efecto estamos usando \textbf{RIPng} pues en esta version del protocolo se utiliza una direccion de \textbf{multicast} reservada para los routers RIP, a diferencia de la version 1 del protocolo (RIPv1) que utiliza una direccion de broadcast. Ahora bien, y más relevante aun, podemos ver las rutas que esta tomando el protocolo, junto con su numero de saltos, como lo podemos ver a continuacion en la siguiente tabla e imagen:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/RIPng-rutas.png}
+    \caption{Rutas del protocolo RIPng.}
+    \label{fig:RIPng-rutas} % Añadida etiqueta para referencia
+\end{figure}
+
+\begin{table}[H]
+\centering
+\caption{Rutas anunciadas en el mensaje RIPng}
+\label{tab:ripng-routes}
+\begin{tabular}{lcc}
+\hline
+\textbf{Prefijo IPv6} & \textbf{Métrica} & \textbf{Interpretación} \\ \hline
+2002:abcd:1435:d1::/64 & 1 & Red alcanzable a 1 salto \\
+2002:abcd:1435:b1::/64 & 1 & Red alcanzable a 1 salto \\ \hline
+\end{tabular}
+\end{table}
+
+Como lo mencionabamos anteriormente, vemos la cantidad de saltos que necesita desde cierto router para alcanzar las diferentes redes que hay habilitadas. En este caso, el mensaje de respuesta (Response) muestra las redes que conoce el router que emite el paquete, anunciándolas a los demás componentes de la red con su métrica correspondiente (número de saltos).
+
+Es importante notar que el paquete de respuesta RIPng capturado (mostrado en la Figura \ref{fig:RIPng-general} y \ref{fig:RIPng-rutas}) se origina desde la dirección link-local \texttt{fe80::a64e:1cff:fec6:fa21}. Al cruzar esta información con la topología (Figura \ref{fig:topology-3}), podemos deducir que este paquete es enviado por el \textbf{Router R3 (Router6)}.
+
+Esto se confirma porque el router está anunciando las dos redes a las que está directamente conectado:
+\begin{itemize}
+    \item \textbf{2002:abcd:1435:d1::/64}: La red LAN del PC-2.
+    \item \textbf{2002:abcd:1435:b1::/64}: La red de la interfaz serial 60/0 que lo conecta con R1.
+\end{itemize}
+Ambas son anunciadas con una \textbf{Métrica de 1}, lo que indica que son redes directamente alcanzables para R3. Este anuncio será recibido por R1, quien a su vez lo re-anunciará a R2, pero incrementando la métrica.
+
+\subsection{Prueba de conectividad}
+
+Ahora vamos a ver la evidencia del correcto funcionamiento del enrutamiento a traves de los paquetes \textbf{ICMPv6}, usando el comando \textit{ping} entre los computadores \textit{PC-1, ip: 2002:abcd:1435:c1::2} y \textit{PC-2, ip: 2002:abcd:1435:d1::a}.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/RIPng-icmp.png}
+    \caption{Prueba de conectividad protocolo RIPng.}
+    \label{fig:RIPng-icmp} % Añadida etiqueta para referencia
+\end{figure}
+
+Antes de analizar las respuestas de eco, la captura \texttt{RIPng-icmp.png} (Figura \ref{fig:RIPng-icmp}) muestra otros procesos fundamentales de \textbf{ICMPv6}. Notablemente, vemos paquetes del \textbf{Neighbor Discovery Protocol (NDP)}, que es el reemplazo de ARP en IPv6:
+
+\begin{itemize}
+    \item \textbf{Neighbor Solicitation (Paquetes 131, 164):} Es el proceso mediante el cual un dispositivo (como PC-1) pregunta "¿Quién tiene la dirección IP...?" para descubrir la dirección MAC de su gateway (R2) o del host de destino (PC-2) si estuviera en la misma red.
+    \item \textbf{Neighbor Advertisement (Paquetes 149, 151):} Es la respuesta a la solicitud anterior, donde un dispositivo (como el router R2) responde "Yo tengo esa IP, y esta es mi dirección MAC".
+\end{itemize}
+
+Este intercambio de NDP es \textbf{esencial} y debe completarse exitosamente antes de que el primer paquete de \textit{ping} pueda ser enrutado correctamente.
+
+En la captura podemos observar los mensajes del protocolo \textbf{ICMPv6} que se generan al ejecutar el comando \textit{ping} desde el \textit{PC-1} (\texttt{2002:abcd:1435:c1::2}) hacia el \textit{PC-2} (\texttt{2002:abcd:1435:d1::a}). En este caso, se aprecia el intercambio correcto de solicitudes y respuestas de eco (\textit{Echo Request} y \textit{Echo Reply}), lo que evidencia que el proceso de enrutamiento entre las redes funciona de manera adecuada.
+
+Cada paquete ICMPv6 de tipo 128 (solicitud de eco) enviado desde el equipo origen recibe su correspondiente paquete de tipo 129 (respuesta de eco) desde el destino, confirmando que los datos están llegando correctamente y regresando sin pérdida alguna. Los valores de \textit{Checksum} aparecen como correctos, lo que indica que no existen errores de transmisión en los mensajes capturados.
+
+El tiempo de respuesta entre la solicitud (paquete 148) y su respectiva respuesta (paquete 149) es aproximadamente de \textbf{2.915 milisegundos}, lo cual es un valor bajo y característico de una red local (LAN) bien configurada. Este tiempo refleja que la comunicación entre ambos extremos es eficiente y que no hay retardos significativos durante el tránsito de los paquetes a través de los routers.
+
+Adicionalmente, el valor del campo \textit{Hop Limit} (similar al TTL en IPv4) en los mensajes capturados permite inferir que existen saltos intermedios entre los dos equipos, lo que concuerda con la topología establecida y confirma que los routers están realizando el reenvío de paquetes correctamente. De igual forma, se identifican las direcciones físicas de origen y destino (\texttt{00:01:9a:9a:4c:4e} y \texttt{00:0f:8f:b8:e2:7c}), correspondientes a los dispositivos involucrados en la comunicación en ese segmento de red.
+
+\subsubsection{Análisis del Flujo de Enrutamiento y Métrica}
+El éxito de esta prueba de conectividad demuestra la convergencia del protocolo RIPng. El flujo de enrutamiento para el paquete de \textit{ping} es el siguiente:
+
+\begin{enumerate}
+    \item PC-1 (\texttt{...:c1::2}) envía el paquete a su gateway, R2.
+    \item R2 consulta su tabla de rutas. Ha aprendido la ruta hacia la red \texttt{...:d1::/64} (de PC-2) a través de R1.
+    \item Como vimos en el análisis anterior, R3 anunció la red \texttt{...:d1::/64} con Métrica 1 a R1. R1, a su vez, la anunció a R2 con una \textbf{Métrica de 2}.
+    \item R2 reenvía el paquete a R1 (su siguiente salto para esa ruta).
+    \item R1 consulta su tabla, ve la ruta de R3 con Métrica 1, y reenvía el paquete a R3.
+    \item R3 entrega el paquete a PC-2 en su red local.
+\end{enumerate}
+
+El tiempo de respuesta de \textbf{2.915 ms} refleja el viaje de ida y vuelta a través de esta ruta de 3 routers (R2 \textrightarrow R1 \textrightarrow R3 para la ida, y R3 \textrightarrow R1 \textrightarrow R2 para la vuelta).
+
+\subsubsection{Análisis del Límite de Saltos (Hop Limit)}
+Un detalle crucial en la captura \texttt{RIPng-icmp.png} refuerza este análisis.
+\begin{itemize}
+    \item El paquete \textbf{148 (Echo Request)} es enviado por PC-1 con un \textit{Hop Limit} (Límite de Saltos) de 64.
+    \item El paquete \textbf{149 (Echo Reply)} es la respuesta de PC-2, que llega de vuelta a PC-1 con un \textit{Hop Limit} de \textbf{62}.
+\end{itemize}
+
+Asumiendo que PC-2 también envió su respuesta con un Hop Limit inicial de 64, el hecho de que llegue con 62 \textbf{podría interpretarse} de dos maneras:
+\begin{enumerate}
+    \item Que el paquete de respuesta atravesó 2 routers.
+    \item Que el paquete atravesó 3 routers (R3, R1, R2), pero uno de ellos no decrementó el Hop Limit (lo cual es atípico pero posible en simuladores) o el Hop Limit inicial de PC-2 era 63.
+\end{enumerate}
+Sin embargo, el dato más relevante (la Métrica de 2 que R2 aprendería) sigue apuntando a la ruta de 3 routers (PC-1 \textrightarrow R2 \textrightarrow R1 \textrightarrow R3 \textrightarrow PC-2) como la establecida por RIPng según la topología.
+
+%==============================================================
+%=======================   OSPF	  =====================
+%==============================================================
+
+\section{Protocolo OSPFv3 (Open Shortest Path First version 3)}
+El protocolo \textbf{OSPFv3} (Open Shortest Path First version 3) es la adaptación del protocolo OSPF para redes \textbf{IPv6}. A diferencia de RIP, OSPF es un protocolo de \textbf{estado de enlace} (link-state). En lugar de anunciar redes con un número de saltos (vector-distancia), los routers OSPF describen sus conexiones (enlaces) a sus vecinos. Todos los routers construyen una base de datos idéntica del estado de los enlaces y utilizan el algoritmo \textbf{Dijkstra} para calcular la ruta más corta (con menor costo) a cada destino. OSPFv3 no tiene el límite de 15 saltos de RIP y opera directamente sobre IPv6 (protocolo 89), sin usar UDP ni TCP.
+
+\subsection{Analisis del protocolo de enrutamiento}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/topology-3.jpg}
+    \caption{Mapa topologia numero 3.}
+\end{figure}
+
+Para empezar, usaremos la topologia 3, donde, como se ve en la imagen, tendremos 3 routers. A continuacion vemos los paquetes capturados con el protocolo \textbf{OSPFv3}.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/OSPFv3-general.png}
+    \caption{Capturas del protocolo OSPFv3.}
+\end{figure}
+
+En esta captura podemos ver varias caracteristicas importantes del protocolo \textbf{OSPFv3}, una de ellas es su operación directa sobre \textbf{IPv6} (Protocolo 89), como se ve en el desglose del paquete. Tambien, podemos ver el uso de la direccion de destino \textit{ff02::5}, que corresponde a la dirección de multicast reservada para "Todos los routers OSPF". A diferencia de RIP, que envía su tabla de enrutamiento completa, OSPFv3 utiliza \textbf{Paquetes "Hello"} (como el capturado) para descubrir, establecer y mantener adyacencias (relaciones de vecindad) con otros routers.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/OSPFv3-rutas.png}
+    \caption{Parámetros del paquete Hello OSPFv3.}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\caption{Parámetros del Paquete Hello OSPFv3}
+\label{tab:ospfv3-hello}
+\begin{tabular}{llc}
+\hline
+\textbf{Parámetro} & \textbf{Valor} & \textbf{Interpretación} \\ \hline
+Source OSPF Router & 1.1.1.1 & El Router ID (RID) del emisor \\
+Area ID & 0.0.0.0 & Pertenece al Área de Backbone \\
+Hello Interval & 10 sec & Envía un "Hello" cada 10 segundos \\
+Router Dead Interval & 40 sec & Considera al vecino caído tras 40 seg \\
+Designated Router & 1.1.1.1 & El emisor se identifica como Router Designado (DR) \\
+Active Neighbor & 3.3.3.3 & Confirma que tiene un vecino activo (RID 3.3.3.3) \\ \hline
+\end{tabular}
+\end{table}
+
+Como lo mencionabamos anteriormente, vemos los parámetros clave que el router con ID \textbf{1.1.1.1} utiliza para negociar su adyacencia. Los intervalos "Hello" y "Dead", así como el ID de Área, deben coincidir entre los vecinos para que se forme la adyacencia. Una vez formada, los routers intercambian sus bases de datos de estado de enlace (LSDs) para construir la topología de la red y calcular las rutas.
+
+\subsection{Prueba de conectividad}
+
+Ahora vamos a ver la evidencia del correcto funcionamiento del enrutamiento a traves de los paquetes \textbf{ICMPv6}, usando el comando \textit{ping} entre los computadores \textit{PC-1, ip: 2002:abcd:1435:c1::2} y \textit{PC-2, ip: 2002:abcd:1435:d1::a}.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/OSPFv3-icmp.png}
+    \caption{Prueba de conectividad protocolo OSPFv3.}
+\end{figure}
+
+En la captura podemos observar los mensajes del protocolo \textbf{ICMPv6} que se generan al ejecutar el comando \textit{ping} desde el \textit{PC-1} (\texttt{2002:abcd:1435:c1::2}) hacia el \textit{PC-2} (\texttt{2002:abcd:1435:d1::a}). En este caso, se aprecia el intercambio correcto de solicitudes y respuestas de eco (\textit{Echo Request} tipo 128 y \textit{Echo Reply} tipo 129), por ejemplo, en los paquetes \textbf{422} y \textbf{423}, lo que evidencia que el proceso de enrutamiento entre las redes funciona de manera adecuada.
+
+Es interesante notar la presencia de mensajes \textit{Destination Unreachable (No route to destination)} (ej. paquete 403, 404) al inicio de la captura. Esto indica que los primeros intentos de ping fallaron, lo cual es normal mientras el protocolo OSPFv3 está en el proceso de \textbf{convergencia} (descubriendo vecinos, eligiendo DR/BDR e intercambiando rutas).
+
+Una vez OSPFv3 ha convergido, cada paquete ICMPv6 de tipo 128 (solicitud de eco) enviado desde el equipo origen recibe su correspondiente paquete de tipo 129 (respuesta de eco) desde el destino, confirmando que los datos están llegando correctamente. Los valores de \textit{Checksum} aparecen como correctos.
+
+El tiempo de respuesta entre la solicitud (paquete 422) y su respectiva respuesta (paquete 423) es de aproximadamente \textbf{67 milisegundos} (\texttt{427.170693 - 427.103601}), lo cual es un valor bajo y característico de una red local (LAN) bien configurada.
+
+Adicionalmente, el valor del campo \textit{Hop Limit} en los mensajes capturados permite inferir que existen saltos intermedios. El paquete de solicitud (422) tiene un Hop Limit de 64, mientras que la respuesta (423) llega con un Hop Limit de 62. Esto concuerda con la topología establecida y confirma que los routers están realizando el reenvío de paquetes correctamente. De igual forma, se identifican las direcciones físicas de origen y destino (\texttt{08:bf:b8:e2:7c:df} y \texttt{d4:6d:50:9a:4c:4e}), correspondientes a los dispositivos involucrados en la comunicación.
+%==============================================================
+%=======================   Evidencia trabajo =====================
+%==============================================================
+
+\section{Evidencia Trabajo cada uno de los estudiantes}
+Por ultimo, incluimos la evidencia de trabajo de nosotros como equipo de trabajo:
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/evidencia-trabajo.jpg}
+    \caption{Evidencia del trabajo de todo el grupo}
+\end{figure}
 
 %==============================================================
 %=======================   BIBLIOGRAFÍA   =====================
