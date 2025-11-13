@@ -211,6 +211,66 @@ El laboratorio permite:
 \end{itemize}
 
 De esta forma, la práctica integra los conceptos fundamentales del \textbf{nivel de red del modelo OSI}, brindando una experiencia completa que abarca el diseño, configuración y validación de una infraestructura de comunicación moderna y funcional.
+%==============================================================
+%=======================   RIPv1   ==============================
+%==============================================================
+\section{Protocolo RIP (Routing Information Protocol)}
+El protocolo \textbf{RIPv1} es un protocolo de enrutamiento dinamico con clase que utiliza el algoritmo belman-fort para encontrar el camino con menor cantidad de saltos; a esto  le llamamos vector distancia. Vale la pena mencionar que este protocolo (RIP en general) no se utiliza para más de 15 saltos, esto por el algoritmo utilizado, al pasar de 15 saltos se considerara inalcanzable, por lo que \textbf{RIP} solo se utiliza para redes pequeñas.
+
+\subsection{Analisis del protocolo de enrutamiento}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/topology-1.jpg}
+    \caption{Mapa topologia numero 1.}
+\end{figure}
+
+Para empezar, usaremos la topologia 1, donde, como se ve en la imagen, tendremos 3 routers (numero de saltos menor a 15), y las capturas de los paquetes que veremos a continuacion corresponderan a las capturas del computador marcado como \textit{PC-2}. A continuacion vemos los paquetes que capturados con el protocolo \textbf{RIP}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/RIPv1-general.png}
+    \caption{Capturas del protocolo RIPv1.}
+\end{figure}
+
+En esta captura podemos ver varias caracteristicas importantes del protocolo \textbf{RIP}, una de ellas es el uso del protocolo de la capa de transporte \textit{UDP} con el puerto 520. Tambien, podemos ver el uso de la direccion de destino \textit{255.255.255.255} mostrando que en efecto estamos usando \textbf{RIPv1} pues en esta version del protocolo se utiliza una direccion broadcast, a diferencia de la version 2 del protocolo que utiliza una direccion de multicast. Ahora bien, y más relevante aun, podemos ver las rutas que esta tomando el protocolo, junto con su numero de saltos, como lo podemos ver a continuacion en la siguiente tabla e imagen:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/RIPv1-rutas.png}
+    \caption{Rutas del protocolo RIPv1.}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\caption{Rutas anunciadas en el mensaje RIPv1}
+\label{tab:ripv1-routes}
+\begin{tabular}{lcc}
+\hline
+\textbf{Dirección IP} & \textbf{Métrica} & \textbf{Interpretación} \\ \hline
+192.168.10.0 & 2 & Red alcanzable a 2 saltos \\
+192.168.20.0 & 2 & Red alcanzable a 2 saltos \\
+192.168.30.0 & 3 & Red alcanzable a 3 saltos \\ \hline
+\end{tabular}
+\end{table}
+
+Como lo mencionabamos anteriormente, vemos la cantidad de saltos que necesita desde cierto router para alcanzar las diferentes redes que hay habilitadas, ademas, muestra como cada uno de los routers "anuncia"  a los demas componentes de la red su tabla de enrutamiento para la llegada a los diferentes segmentos de la red.
+
+\subsection{Prueba de conectividad}
+
+Ahora vamos a ver la evidencia del correcto funcionamiento del enrutamiento a traves de los paquetes icmp, usando el comando \textit{ping} entre los computadores \textit{PC-0, ip: 192.168.40.31} y \textit{PC-2, ip: 192.168.30.31} 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/RIPv1-icmp.png}
+    \caption{Prueba de conectividad protocolo RIPv1.}
+\end{figure}
+
+En la captura podemos observar los mensajes del protocolo \textbf{ICMP} que se generan al ejecutar el comando \textit{ping} desde el \textit{PC-2} (\texttt{192.168.40.31}) hacia el \textit{PC-0} (\texttt{192.168.30.31}). En este caso, se aprecia el intercambio correcto de solicitudes y respuestas de eco (\textit{Echo Request} y \textit{Echo Reply}), lo que evidencia que el proceso de enrutamiento entre las redes funciona de manera adecuada.
+
+Cada paquete ICMP de tipo 8 (solicitud de eco) enviado desde el equipo origen recibe su correspondiente paquete de tipo 0 (respuesta de eco) desde el destino, confirmando que los datos están llegando correctamente y regresando sin pérdida alguna. Los valores de \textit{Checksum} aparecen como correctos, lo que indica que no existen errores de transmisión en los mensajes capturados.
+
+El tiempo de respuesta entre cada solicitud y su respectiva respuesta es aproximadamente de \textbf{0.021 milisegundos}, lo cual es un valor bajo y característico de una red local (LAN) bien configurada. Este tiempo refleja que la comunicación entre ambos extremos es eficiente y que no hay retardos significativos durante el tránsito de los paquetes a través de los routers.
+
+Adicionalmente, el valor del campo \textit{TTL (Time To Live)} en los mensajes capturados permite inferir que existe al menos un salto intermedio entre los dos equipos, lo que concuerda con la topología establecida y confirma que los routers están realizando el reenvío de paquetes correctamente. De igual forma, se identifican las direcciones físicas de origen y destino (\texttt{08:bf:b8:e2:7c:df} y \texttt{d4:6d:50:94:cb:72}), correspondientes a los dispositivos involucrados en la comunicación.
 
 %==============================================================
 %=======================   BGP   ==============================
