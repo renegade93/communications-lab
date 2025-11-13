@@ -195,6 +195,34 @@
 \clearpage
 
 \renewcommand{\thesection}{\arabic{section}}
+\section*{Mapas de cada topología}
+\subsubsection*{Topología \#1 - RIPv1 y OSPF (IPv4)}
+Esta topología conecta tres routers (R1, R2 y R3) y dos PCs ubicadas en redes finales independientes. Se utilizan las redes \textbf{192.168.10.0}, \textbf{192.168.20.0}, \textbf{192.168.30.0} y \textbf{192.168.40.0}, junto con interfaces loopback anunciadas mediante enrutamiento dinámico. El objetivo es configurar y comprobar el funcionamiento de RIPv1 y OSPF, permitiendo que las estaciones finales intercambien tráfico a través de rutas aprendidas automáticamente.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/topology-1.jpg}
+    \caption{Topología \#1}
+\end{figure}
+
+\subsubsection*{Topología \#2 - BGP (IPv4)}
+En esta topología los routers R7, R8 y R9 conforman una estructura tipo “Y” que simula diferentes sistemas autónomos interconectados. Cada router anuncia redes propias como \textbf{192.168.10.0}, \textbf{192.168.40.0}, \textbf{192.168.50.0} y \textbf{192.168.60.0}, y cada subred final contiene una PC. Su propósito es implementar BGP para el intercambio de prefijos entre los routers y validar la comunicación extremo a extremo mediante rutas basadas en políticas.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=405pt]{images/topology-2.jpg}
+    \caption{Topología \#2}
+\end{figure}
+
+
+
+\subsubsection*{Topología \#3 - RIPng y OSPFv3 (IPv6)}
+La tercera topología conecta tres routers (R4, R5 y R6) mediante enlaces IPv6 con prefijos /64, junto con dos PCs en redes finales independientes. Utiliza los bloques \textbf{2001:ABCD:1435::/64} y \textbf{2002:ABCD:1435::/64} según lo definido por el laboratorio. Aquí se configuran RIPng y OSPFv3 para observar la distribución dinámica de rutas IPv6 y validar la conectividad entre los equipos.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/topology-3.jpg}
+    \caption{Topología \#3}
+\end{figure}
+
 \section*{Introducción}
 \addcontentsline{toc}{section}{Introducción}
 
